@@ -53,7 +53,6 @@ import org.thoughtcrime.securesms.mms.PartAuthority;
 import org.thoughtcrime.securesms.mms.Slide;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.util.DateUtils;
-import org.thoughtcrime.securesms.util.Emoji;
 
 import java.util.Locale;
 import java.util.Set;
@@ -201,7 +200,7 @@ public class ConversationItem extends LinearLayout {
     }
 
     bubbleContainer.setState(transportationState, mediaCaptionState);
-}
+  }
 
   private void setSelectionBackgroundDrawables(MessageRecord messageRecord) {
     int[]      attributes = new int[]{R.attr.conversation_list_item_background_selected,
@@ -239,9 +238,7 @@ public class ConversationItem extends LinearLayout {
     if (isCaptionlessMms(messageRecord)) {
       bodyText.setVisibility(View.GONE);
     } else {
-      bodyText.setText(Emoji.getInstance(context).emojify(messageRecord.getDisplayBody(),
-                                                          new Emoji.InvalidatingPageLoadedListener(bodyText)),
-                       TextView.BufferType.SPANNABLE);
+      bodyText.setText(messageRecord.getDisplayBody());
       bodyText.setVisibility(View.VISIBLE);
     }
 
@@ -357,7 +354,9 @@ public class ConversationItem extends LinearLayout {
 
   private void resolveMedia(MediaMmsMessageRecord messageRecord) {
     if (hasMedia(messageRecord)) {
-      mediaThumbnail.setImageResource(messageRecord.getSlideDeckFuture(), masterSecret);
+      mediaThumbnail.setImageResource(masterSecret, messageRecord.getId(),
+                                      messageRecord.getDateReceived(),
+                                      messageRecord.getSlideDeckFuture());
     }
   }
 
@@ -373,17 +372,7 @@ public class ConversationItem extends LinearLayout {
   /// Event handlers
 
   private void handleKeyExchangeClicked() {
-    Intent intent = new Intent(context, ReceiveKeyActivity.class);
-    intent.putExtra("recipient", messageRecord.getIndividualRecipient().getRecipientId());
-    intent.putExtra("recipient_device_id", messageRecord.getRecipientDeviceId());
-    intent.putExtra("body", messageRecord.getBody().getBody());
-    intent.putExtra("thread_id", messageRecord.getThreadId());
-    intent.putExtra("message_id", messageRecord.getId());
-    intent.putExtra("is_bundle", messageRecord.isBundleKeyExchange());
-    intent.putExtra("is_identity_update", messageRecord.isIdentityUpdate());
-    intent.putExtra("is_push", messageRecord.isPush());
-    intent.putExtra("sent", messageRecord.isOutgoing());
-    context.startActivity(intent);
+    ReceiveKeyDialog.build(context, masterSecret, messageRecord).show();
   }
 
   private class ThumbnailClickListener implements ThumbnailView.ThumbnailClickListener {
