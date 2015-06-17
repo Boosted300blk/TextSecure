@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
     compile 'me.leolin:ShortcutBadger:1.1.0-WS1'
-    compile 'se.emilsjolander:stickylistheaders:2.2.0'
+    compile 'se.emilsjolander:stickylistheaders:2.7.0'
     compile 'com.google.android.gms:play-services-base:6.5.87'
     compile 'com.jpardogo.materialtabstrip:library:1.0.9'
     compile 'org.w3c:smil:1.0.0'
@@ -76,15 +76,21 @@ dependencies {
         exclude group: 'org.hamcrest', module: 'hamcrest-core'
     }
     androidTestCompile ('com.squareup.assertj:assertj-android:1.0.0') {
-        exclude group: 'org.hamcrest', module: 'hamcrest-core'
+        exclude group: 'org.hamcrest',        module: 'hamcrest-core'
+        exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile 'com.android.support.test:runner:0.2'
+    androidTestCompile ('com.android.support.test:runner:0.2') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.1') {
+        exclude group: 'javax.inject'
+    }
 }
 
 dependencyVerification {
     verify = [
             'me.leolin:ShortcutBadger:3142d017234bfa0cdd69ccded7cc5ea63f13b97574803c8c616c9bbeaad33ad9',
-            'se.emilsjolander:stickylistheaders:89146b46c96fea0e40200474a2625cda10fe94891e4128f53cdb42375091b9b6',
+            'se.emilsjolander:stickylistheaders:a08ca948aa6b220f09d82f16bbbac395f6b78897e9eeac6a9f0b0ba755928eeb',
             'com.google.android.gms:play-services-base:832cb6b3130e871db6a412c4ab585656dbcc5e7948101f190186757785703f75',
             'com.jpardogo.materialtabstrip:library:c6ef812fba4f74be7dc4a905faa4c2908cba261a94c13d4f96d5e67e4aad4aaa',
             'org.w3c:smil:085dc40f2bb249651578bfa07499fd08b16ad0886dbe2c4078586a408da62f9b',
@@ -129,7 +135,7 @@ dependencyVerification {
 android {
     compileSdkVersion 22
     buildToolsVersion '22.0.1'
-    testBuildType "testing"
+    testBuildType "debugTest"
 
     dexOptions {
         javaMaxHeapSize "4g"
@@ -141,6 +147,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "BUILD_TIMESTAMP", System.currentTimeMillis() + "L"
+        buildConfigField "String", "PUSH_URL", "\"https://textsecure-service.whispersystems.org\""
     }
 
     compileOptions {
@@ -183,9 +190,10 @@ android {
             proguardFiles = buildTypes.debug.proguardFiles
             signingConfig signingConfigs.release
         }
-        testing.initWith(buildTypes.debug)
-        testing {
+        debugTest.initWith(buildTypes.debug)
+        debugTest {
             proguardFile 'proguard-testing.pro'
+            buildConfigField "String", "PUSH_URL", "\"https://textsecure-service-staging.whispersystems.org\""
         }
     }
 
@@ -200,10 +208,7 @@ android {
             assets.srcDirs = ['assets']
         }
         androidTest {
-            java.srcDirs = ['androidTest/java']
-            resources.srcDirs = ['androidTest/java']
-            aidl.srcDirs = ['androidTest/java']
-            renderscript.srcDirs = ['androidTest/java']
+            java.srcDirs = ['test/androidTest/java']
         }
     }
 
@@ -241,4 +246,29 @@ if (propFile.canRead()){
 }else {
     println 'signing.properties not found'
     android.buildTypes.release.signingConfig = null
+}
+
+if (project.hasProperty('espresso') && System.console() != null) {
+    println "______________________WARNING_______________________"
+    println "ALL YOUR CONTACTS WILL BE DELETED IN THE PROCESS"
+    println "OF RUNNING THESE TESTS, TYPE 'delete all my contacts'"
+    println "TO CONTINUE"
+    println "----------------------------------------------------"
+
+    def input = System.console().readLine(':')
+    if (input == 'delete all my contacts') {
+        android.productFlavors {
+            base {}
+            espresso {
+                testInstrumentationRunner "org.thoughtcrime.securesms.TextSecureWakingTestRunner"
+            }
+        }
+        android.sourceSets.espresso {
+            manifest.srcFile 'test/espresso/AndroidManifest.xml'
+        }
+        android.sourceSets.androidTestEspresso {
+            java.srcDirs = ['test/androidTestEspresso/java']
+            res.srcDirs  = ['test/androidTestEspresso/res']
+        }
+    }
 }
