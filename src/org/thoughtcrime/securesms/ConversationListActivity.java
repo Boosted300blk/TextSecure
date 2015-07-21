@@ -174,6 +174,7 @@ public class ConversationListActivity extends PassphraseRequiredActionBarActivit
     intent.putExtra(ConversationActivity.DISTRIBUTION_TYPE_EXTRA, distributionType);
 
     startActivity(intent);
+    overridePendingTransition(R.anim.slide_from_right, R.anim.fade_scale_out);
   }
 
   private void handleDisplaySettings() {
@@ -211,8 +212,7 @@ public class ConversationListActivity extends PassphraseRequiredActionBarActivit
       @Override
       public void onChange(boolean selfChange) {
         super.onChange(selfChange);
-        Log.w(TAG, "detected android contact data changed, refreshing cache");
-        // TODO only clear updated recipients from cache
+        Log.w(TAG, "Detected android contact data changed, refreshing cache");
         RecipientFactory.clearCache();
         ConversationListActivity.this.runOnUiThread(new Runnable() {
           @Override

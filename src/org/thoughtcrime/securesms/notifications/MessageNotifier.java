@@ -31,11 +31,13 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationCompat.InboxStyle;
+import android.support.v4.app.RemoteInput;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -46,6 +48,7 @@ import android.util.Log;
 import org.thoughtcrime.securesms.ConversationActivity;
 import org.thoughtcrime.securesms.ConversationListActivity;
 import org.thoughtcrime.securesms.R;
+import org.thoughtcrime.securesms.contacts.avatars.ContactColors;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.database.MmsSmsDatabase;
@@ -85,6 +88,8 @@ public class MessageNotifier {
 
   private volatile static long visibleThread = -1;
 
+  public static final String EXTRA_VOICE_REPLY = "extra_voice_reply";
+
   public static void setVisibleThread(long threadId) {
     visibleThread = threadId;
   }
@@ -94,9 +99,8 @@ public class MessageNotifier {
       sendInThreadNotification(context, recipients);
     } else {
       Intent intent = new Intent(context, ConversationActivity.class);
-      intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-      intent.putExtra("recipients", recipients.getIds());
-      intent.putExtra("thread_id", threadId);
+      intent.putExtra(ConversationActivity.RECIPIENTS_EXTRA, recipients.getIds());
+      intent.putExtra(ConversationActivity.THREAD_ID_EXTRA, threadId);
       intent.setData((Uri.parse("custom://"+System.currentTimeMillis())));
 
       NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -115,15 +119,26 @@ public class MessageNotifier {
     }
   }
 
-  public static void updateNotification(Context context, MasterSecret masterSecret) {
+  public static void updateNotification(@NonNull Context context, @Nullable MasterSecret masterSecret) {
     if (!TextSecurePreferences.isNotificationsEnabled(context)) {
       return;
     }
 
-    updateNotification(context, masterSecret, false, 0);
+    updateNotification(context, masterSecret, false, false, 0);
   }
 
-  public static void updateNotification(Context context, MasterSecret masterSecret, long threadId) {
+  public static void updateNotification(@NonNull  Context context,
+                                        @Nullable MasterSecret masterSecret,
+                                        long threadId)
+  {
+    updateNotification(context, masterSecret, false, threadId);
+  }
+
+  public static void updateNotification(@NonNull  Context context,
+                                        @Nullable MasterSecret masterSecret,
+                                        boolean   includePushDatabase,
+                                        long      threadId)
+  {
     Recipients recipients = DatabaseFactory.getThreadDatabase(context)
                                            .getRecipientsForThreadId(threadId);
 
@@ -133,17 +148,21 @@ public class MessageNotifier {
       return;
     }
 
-
     if (visibleThread == threadId) {
       ThreadDatabase threads = DatabaseFactory.getThreadDatabase(context);
       threads.setRead(threadId);
       sendInThreadNotification(context, threads.getRecipientsForThreadId(threadId));
     } else {
-      updateNotification(context, masterSecret, true, 0);
+      updateNotification(context, masterSecret, true, includePushDatabase, 0);
     }
   }
 
-  private static void updateNotification(Context context, MasterSecret masterSecret, boolean signal, int reminderCount) {
+  private static void updateNotification(@NonNull  Context context,
+                                         @Nullable MasterSecret masterSecret,
+                                         boolean signal,
+                                         boolean includePushDatabase,
+                                         int     reminderCount)
+  {
     Cursor telcoCursor = null;
     Cursor pushCursor  = null;
 
@@ -163,7 +182,9 @@ public class MessageNotifier {
 
       NotificationState notificationState = constructNotificationState(context, masterSecret, telcoCursor);
 
-      appendPushNotificationState(context, masterSecret, notificationState, pushCursor);
+      if (includePushDatabase) {
+        appendPushNotificationState(context, notificationState, pushCursor);
+      }
 
       if (notificationState.hasMultipleThreads()) {
         sendMultipleThreadNotification(context, masterSecret, notificationState, signal);
@@ -179,9 +200,9 @@ public class MessageNotifier {
     }
   }
 
-  private static void sendSingleThreadNotification(Context context,
-                                                   MasterSecret masterSecret,
-                                                   NotificationState notificationState,
+  private static void sendSingleThreadNotification(@NonNull  Context context,
+                                                   @Nullable MasterSecret masterSecret,
+                                                   @NonNull  NotificationState notificationState,
                                                    boolean signal)
   {
     if (notificationState.getNotifications().isEmpty()) {
@@ -192,9 +213,11 @@ public class MessageNotifier {
 
     List<NotificationItem>     notifications       = notificationState.getNotifications();
     NotificationCompat.Builder builder             = new NotificationCompat.Builder(context);
+    Recipients                 recipients          = notifications.get(0).getRecipients();
     Recipient                  recipient           = notifications.get(0).getIndividualRecipient();
-    Drawable                   recipientPhoto      = recipient.getContactPhoto();
     int                        largeIconTargetSize = context.getResources().getDimensionPixelSize(R.dimen.contact_photo_target_size);
+    Drawable                   recipientPhoto      = recipient.getContactPhoto().asDrawable(context, recipients == null ? ContactColors.UNKNOWN_COLOR.toConversationColor(context) :
+                                                                                                     recipients.getColor().toConversationColor(context));
 
     if (recipientPhoto != null) {
       Bitmap recipientPhotoBitmap = BitmapUtil.createFromDrawable(recipientPhoto, largeIconTargetSize, largeIconTargetSize);
@@ -218,10 +241,24 @@ public class MessageNotifier {
 
     if (masterSecret != null) {
       Action markAsReadAction = new Action(R.drawable.check,
-                                           context.getString(R.string.MessageNotifier_mark_as_read),
-                                           notificationState.getMarkAsReadIntent(context, masterSecret));
+                                           context.getString(R.string.MessageNotifier_mark_read),
+                                           notificationState.getMarkAsReadIntent(context));
+
+      Action replyAction = new Action(R.drawable.ic_reply_white_36dp,
+                                      context.getString(R.string.MessageNotifier_reply),
+                                      notificationState.getQuickReplyIntent(context, recipients));
+
+      Action wearableReplyAction = new Action.Builder(R.drawable.ic_reply,
+                                                      context.getString(R.string.MessageNotifier_reply),
+                                                      notificationState.getWearableReplyIntent(context, recipients))
+          .addRemoteInput(new RemoteInput.Builder(EXTRA_VOICE_REPLY).setLabel(context.getString(R.string.MessageNotifier_reply)).build())
+          .build();
+
       builder.addAction(markAsReadAction);
-      builder.extend(new NotificationCompat.WearableExtender().addAction(markAsReadAction));
+      builder.addAction(replyAction);
+
+      builder.extend(new NotificationCompat.WearableExtender().addAction(markAsReadAction)
+                                                              .addAction(wearableReplyAction));
     }
 
     SpannableStringBuilder content = new SpannableStringBuilder();
@@ -247,9 +284,9 @@ public class MessageNotifier {
       .notify(NOTIFICATION_ID, builder.build());
   }
 
-  private static void sendMultipleThreadNotification(Context context,
-                                                     MasterSecret masterSecret,
-                                                     NotificationState notificationState,
+  private static void sendMultipleThreadNotification(@NonNull  Context context,
+                                                     @Nullable MasterSecret masterSecret,
+                                                     @NonNull  NotificationState notificationState,
                                                      boolean signal)
   {
     List<NotificationItem> notifications = notificationState.getNotifications();
@@ -277,7 +314,7 @@ public class MessageNotifier {
     if (masterSecret != null) {
        Action markAllAsReadAction = new Action(R.drawable.check,
                                                context.getString(R.string.MessageNotifier_mark_all_as_read),
-                                               notificationState.getMarkAsReadIntent(context, masterSecret));
+                                               notificationState.getMarkAsReadIntent(context));
        builder.addAction(markAllAsReadAction);
        builder.extend(new NotificationCompat.WearableExtender().addAction(markAllAsReadAction));
     }
@@ -313,7 +350,7 @@ public class MessageNotifier {
         return;
       }
 
-      Uri uri = recipients.getRingtone();
+      Uri uri = recipients != null ? recipients.getRingtone() : null;
 
       if (uri == null) {
         String ringtone = TextSecurePreferences.getNotificationRingtone(context);
@@ -356,13 +393,10 @@ public class MessageNotifier {
     }
   }
 
-  private static void appendPushNotificationState(Context context,
-                                                  MasterSecret masterSecret,
-                                                  NotificationState notificationState,
-                                                  Cursor cursor)
+  private static void appendPushNotificationState(@NonNull Context context,
+                                                  @NonNull NotificationState notificationState,
+                                                  @NonNull Cursor cursor)
   {
-    if (masterSecret != null) return;
-
     PushDatabase.Reader reader = null;
     TextSecureEnvelope envelope;
 
@@ -373,7 +407,7 @@ public class MessageNotifier {
         Recipients      recipients = RecipientFactory.getRecipientsFromString(context, envelope.getSource(), false);
         Recipient       recipient  = recipients.getPrimaryRecipient();
         long            threadId   = DatabaseFactory.getThreadDatabase(context).getThreadIdFor(recipients);
-        SpannableString body       = new SpannableString(context.getString(R.string.MessageNotifier_encrypted_message));
+        SpannableString body       = new SpannableString(context.getString(R.string.MessageNotifier_locked_message));
         body.setSpan(new StyleSpan(android.graphics.Typeface.ITALIC), 0, body.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         if (!recipients.isMuted()) {
@@ -386,9 +420,9 @@ public class MessageNotifier {
     }
   }
 
-  private static NotificationState constructNotificationState(Context context,
-                                                              MasterSecret masterSecret,
-                                                              Cursor cursor)
+  private static NotificationState constructNotificationState(@NonNull  Context context,
+                                                              @Nullable MasterSecret masterSecret,
+                                                              @NonNull  Cursor cursor)
   {
     NotificationState notificationState = new NotificationState();
     MessageRecord record;
@@ -414,7 +448,7 @@ public class MessageNotifier {
       }
 
       if (SmsDatabase.Types.isDecryptInProgressType(record.getType()) || !record.getBody().isPlaintext()) {
-        body = SpanUtil.italic(context.getString(R.string.MessageNotifier_encrypted_message));
+        body = SpanUtil.italic(context.getString(R.string.MessageNotifier_locked_message));
       } else if (record.isMms() && TextUtils.isEmpty(body)) {
         body = SpanUtil.italic(context.getString(R.string.MessageNotifier_media_message));
       } else if (record.isMms() && !record.isMmsNotification()) {

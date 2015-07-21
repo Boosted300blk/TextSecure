@@ -14,14 +14,12 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.crypto.IdentityKeyUtil;
-import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.crypto.PreKeyUtil;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.jobs.GcmRefreshJob;
 import org.thoughtcrime.securesms.push.TextSecureCommunicationFactory;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientFactory;
-import org.thoughtcrime.securesms.recipients.RecipientFormattingException;
 import org.thoughtcrime.securesms.util.DirectoryHelper;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.thoughtcrime.securesms.util.Util;
@@ -34,6 +32,7 @@ import org.whispersystems.textsecure.api.TextSecureAccountManager;
 import org.whispersystems.textsecure.api.push.exceptions.ExpectationFailedException;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,7 +76,7 @@ public class RegistrationService extends Service {
 
   private volatile RegistrationState registrationState = new RegistrationState(RegistrationState.STATE_IDLE);
 
-  private volatile Handler                 registrationStateHandler;
+  private volatile WeakReference<Handler>  registrationStateHandler;
   private volatile ChallengeReceiver       challengeReceiver;
   private          String                  challenge;
   private          long                    verificationStartTime;
@@ -153,15 +152,14 @@ public class RegistrationService extends Service {
   private void handleVoiceRegistrationIntent(Intent intent) {
     markAsVerifying(true);
 
-    String       number       = intent.getStringExtra("e164number");
-    String       password     = intent.getStringExtra("password"  );
-    String       signalingKey = intent.getStringExtra("signaling_key");
-    MasterSecret masterSecret = intent.getParcelableExtra("master_secret");
+    String number       = intent.getStringExtra("e164number");
+    String password     = intent.getStringExtra("password");
+    String signalingKey = intent.getStringExtra("signaling_key");
 
     try {
       TextSecureAccountManager accountManager = TextSecureCommunicationFactory.createManager(this, number, password);
 
-      handleCommonRegistration(masterSecret, accountManager, number);
+      handleCommonRegistration(accountManager, number);
 
       markAsVerified(number, password, signalingKey);
 
@@ -181,9 +179,8 @@ public class RegistrationService extends Service {
   private void handleSmsRegistrationIntent(Intent intent) {
     markAsVerifying(true);
 
-    String       number       = intent.getStringExtra("e164number");
-    MasterSecret masterSecret = intent.getParcelableExtra("master_secret");
-    int          registrationId = TextSecurePreferences.getLocalRegistrationId(this);
+    String number         = intent.getStringExtra("e164number");
+    int    registrationId = TextSecurePreferences.getLocalRegistrationId(this);
 
     if (registrationId == 0) {
       registrationId = KeyHelper.generateRegistrationId(false);
@@ -204,7 +201,7 @@ public class RegistrationService extends Service {
       String challenge = waitForChallenge();
       accountManager.verifyAccount(challenge, signalingKey, true, registrationId);
 
-      handleCommonRegistration(masterSecret, accountManager, number);
+      handleCommonRegistration(accountManager, number);
       markAsVerified(number, password, signalingKey);
 
       setState(new RegistrationState(RegistrationState.STATE_COMPLETE, number));
@@ -230,15 +227,15 @@ public class RegistrationService extends Service {
     }
   }
 
-  private void handleCommonRegistration(MasterSecret masterSecret, TextSecureAccountManager accountManager, String number)
+  private void handleCommonRegistration(TextSecureAccountManager accountManager, String number)
       throws IOException
   {
     setState(new RegistrationState(RegistrationState.STATE_GENERATING_KEYS, number));
     Recipient          self         = RecipientFactory.getRecipientsFromString(this, number, false).getPrimaryRecipient();
-    IdentityKeyPair    identityKey  = IdentityKeyUtil.getIdentityKeyPair(this, masterSecret);
-    List<PreKeyRecord> records      = PreKeyUtil.generatePreKeys(this, masterSecret);
-    PreKeyRecord       lastResort   = PreKeyUtil.generateLastResortKey(this, masterSecret);
-    SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(this, masterSecret, identityKey);
+    IdentityKeyPair    identityKey  = IdentityKeyUtil.getIdentityKeyPair(this);
+    List<PreKeyRecord> records      = PreKeyUtil.generatePreKeys(this);
+    PreKeyRecord       lastResort   = PreKeyUtil.generateLastResortKey(this);
+    SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(this, identityKey);
     accountManager.setPreKeys(identityKey.getPublicKey(),lastResort, signedPreKey, records);
 
     setState(new RegistrationState(RegistrationState.STATE_GCM_REGISTERING, number));
@@ -249,7 +246,7 @@ public class RegistrationService extends Service {
     TextSecurePreferences.setGcmRegistrationId(this, gcmRegistrationId);
     TextSecurePreferences.setWebsocketRegistered(this, true);
 
-    DatabaseFactory.getIdentityDatabase(this).saveIdentity(masterSecret, self.getRecipientId(), identityKey.getPublicKey());
+    DatabaseFactory.getIdentityDatabase(this).saveIdentity(self.getRecipientId(), identityKey.getPublicKey());
     DirectoryHelper.refreshDirectory(this, accountManager, number);
 
     DirectoryRefreshListener.schedule(this);
@@ -298,6 +295,8 @@ public class RegistrationService extends Service {
   private void setState(RegistrationState state) {
     this.registrationState = state;
 
+    Handler registrationStateHandler = this.registrationStateHandler.get();
+
     if (registrationStateHandler != null) {
       registrationStateHandler.obtainMessage(state.state, state).sendToTarget();
     }
@@ -319,7 +318,7 @@ public class RegistrationService extends Service {
   }
 
   public void setRegistrationStateHandler(Handler registrationStateHandler) {
-    this.registrationStateHandler = registrationStateHandler;
+    this.registrationStateHandler = new WeakReference<>(registrationStateHandler);
   }
 
   public class RegistrationServiceBinder extends Binder {

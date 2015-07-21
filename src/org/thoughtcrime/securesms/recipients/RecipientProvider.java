@@ -18,23 +18,25 @@ package org.thoughtcrime.securesms.recipients;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.thoughtcrime.securesms.contacts.ContactPhotoFactory;
+import org.thoughtcrime.securesms.color.MaterialColor;
+import org.thoughtcrime.securesms.contacts.avatars.ContactPhoto;
+import org.thoughtcrime.securesms.contacts.avatars.ContactPhotoFactory;
 import org.thoughtcrime.securesms.database.CanonicalAddressDatabase;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.database.GroupDatabase;
-import org.thoughtcrime.securesms.database.RecipientPreferenceDatabase;
 import org.thoughtcrime.securesms.database.RecipientPreferenceDatabase.RecipientsPreferences;
 import org.thoughtcrime.securesms.util.GroupUtil;
 import org.thoughtcrime.securesms.util.LRUCache;
 import org.thoughtcrime.securesms.util.ListenableFutureTask;
 import org.thoughtcrime.securesms.util.Util;
+import org.whispersystems.libaxolotl.util.guava.Optional;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -47,9 +49,11 @@ import java.util.concurrent.ExecutorService;
 
 public class RecipientProvider {
 
-  private static final Map<Long,Recipient>          recipientCache         = Collections.synchronizedMap(new LRUCache<Long,Recipient>(1000));
-  private static final Map<RecipientIds,Recipients> recipientsCache        = Collections.synchronizedMap(new LRUCache<RecipientIds, Recipients>(1000));
-  private static final ExecutorService              asyncRecipientResolver = Util.newSingleThreadedLifoExecutor();
+  private static final String TAG = RecipientProvider.class.getSimpleName();
+
+  private static final RecipientCache  recipientCache         = new RecipientCache();
+  private static final RecipientsCache recipientsCache        = new RecipientsCache();
+  private static final ExecutorService asyncRecipientResolver = Util.newSingleThreadedLifoExecutor();
 
   private static final String[] CALLER_ID_PROJECTION = new String[] {
     PhoneLookup.DISPLAY_NAME,
@@ -60,127 +64,102 @@ public class RecipientProvider {
 
   Recipient getRecipient(Context context, long recipientId, boolean asynchronous) {
     Recipient cachedRecipient = recipientCache.get(recipientId);
+    if (cachedRecipient != null && !cachedRecipient.isStale()) return cachedRecipient;
 
-    if      (cachedRecipient != null) return cachedRecipient;
-    else if (asynchronous)            return getAsynchronousRecipient(context, recipientId);
-    else                              return getSynchronousRecipient(context, recipientId);
+    String number = CanonicalAddressDatabase.getInstance(context).getAddressFromId(recipientId);
+
+    if (asynchronous) {
+      cachedRecipient = new Recipient(recipientId, number, cachedRecipient, getRecipientDetailsAsync(context, recipientId, number));
+    } else {
+      cachedRecipient = new Recipient(recipientId, getRecipientDetailsSync(context, recipientId, number));
+    }
+
+    recipientCache.set(recipientId, cachedRecipient);
+    return cachedRecipient;
   }
 
   Recipients getRecipients(Context context, long[] recipientIds, boolean asynchronous) {
     Recipients cachedRecipients = recipientsCache.get(new RecipientIds(recipientIds));
-    if (cachedRecipients != null) return cachedRecipients;
+    if (cachedRecipients != null && !cachedRecipients.isStale()) return cachedRecipients;
 
     List<Recipient> recipientList = new LinkedList<>();
 
     for (long recipientId : recipientIds) {
-      recipientList.add(getRecipient(context, recipientId, false));
+      recipientList.add(getRecipient(context, recipientId, asynchronous));
     }
 
-    if (asynchronous) cachedRecipients = new Recipients(recipientList, getRecipientsPreferencesAsync(context, recipientIds));
+    if (asynchronous) cachedRecipients = new Recipients(recipientList, cachedRecipients, getRecipientsPreferencesAsync(context, recipientIds));
     else              cachedRecipients = new Recipients(recipientList, getRecipientsPreferencesSync(context, recipientIds));
 
-    recipientsCache.put(new RecipientIds(recipientIds), cachedRecipients);
+    recipientsCache.set(new RecipientIds(recipientIds), cachedRecipients);
     return cachedRecipients;
   }
 
-  private Recipient getSynchronousRecipient(final Context context, final long recipientId) {
-    Log.w("RecipientProvider", "Cache miss [SYNC]!");
-
-    final Recipient recipient;
-    RecipientDetails details;
-    String number = CanonicalAddressDatabase.getInstance(context).getAddressFromId(recipientId);
-    final boolean isGroupRecipient = GroupUtil.isEncodedGroup(number);
-
-    if (isGroupRecipient) details = getGroupRecipientDetails(context, number);
-    else                  details = getRecipientDetails(context, number);
-
-    if (details != null) {
-      recipient = new Recipient(details.name, details.number, recipientId, details.contactUri, details.avatar);
-    } else {
-      final Drawable defaultPhoto        = isGroupRecipient
-                                           ? ContactPhotoFactory.getDefaultGroupPhoto(context)
-                                           : ContactPhotoFactory.getDefaultContactPhoto(context, null);
-
-      recipient = new Recipient(null, number, recipientId, null, defaultPhoto);
-    }
-
-    recipientCache.put(recipientId, recipient);
-    return recipient;
+  void clearCache() {
+    recipientCache.reset();
+    recipientsCache.reset();
   }
 
-  private Recipient getAsynchronousRecipient(final Context context, final long recipientId) {
-    Log.w("RecipientProvider", "Cache miss [ASYNC]!");
-
-    final String number = CanonicalAddressDatabase.getInstance(context).getAddressFromId(recipientId);
-    final boolean isGroupRecipient = GroupUtil.isEncodedGroup(number);
-
+  private @NonNull ListenableFutureTask<RecipientDetails> getRecipientDetailsAsync(final Context context,
+                                                                                   final long recipientId,
+                                                                                   final String number)
+  {
     Callable<RecipientDetails> task = new Callable<RecipientDetails>() {
       @Override
       public RecipientDetails call() throws Exception {
-        if (isGroupRecipient) return getGroupRecipientDetails(context, number);
-        else                  return getRecipientDetails(context, number);
+        return getRecipientDetailsSync(context, recipientId, number);
       }
     };
 
     ListenableFutureTask<RecipientDetails> future = new ListenableFutureTask<>(task);
-
     asyncRecipientResolver.submit(future);
-
-    Drawable contactPhoto;
-
-    if (isGroupRecipient) {
-      contactPhoto        = ContactPhotoFactory.getDefaultGroupPhoto(context);
-    } else {
-      contactPhoto        = ContactPhotoFactory.getLoadingPhoto(context);
-    }
-
-    Recipient recipient = new Recipient(number, contactPhoto, recipientId, future);
-    recipientCache.put(recipientId, recipient);
-
-    return recipient;
+    return future;
   }
 
-  void clearCache() {
-    recipientCache.clear();
-    recipientsCache.clear();
+  private @NonNull RecipientDetails getRecipientDetailsSync(Context context, long recipientId, String number) {
+    if (GroupUtil.isEncodedGroup(number)) return getGroupRecipientDetails(context, number);
+    else                                  return getIndividualRecipientDetails(context, recipientId, number);
   }
 
-  private RecipientDetails getRecipientDetails(Context context, String number) {
-    Uri uri       = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-    Cursor cursor = context.getContentResolver().query(uri, CALLER_ID_PROJECTION,
-                                                       null, null, null);
+  private @NonNull RecipientDetails getIndividualRecipientDetails(Context context, long recipientId, String number) {
+    Optional<RecipientsPreferences> preferences = DatabaseFactory.getRecipientPreferenceDatabase(context).getRecipientsPreferences(new long[]{recipientId});
+    MaterialColor                   color       = preferences.isPresent() ? preferences.get().getColor() : null;
+    Uri                             uri         = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+    Cursor                          cursor      = context.getContentResolver().query(uri, CALLER_ID_PROJECTION,
+                                                                                     null, null, null);
 
     try {
       if (cursor != null && cursor.moveToFirst()) {
-        Uri      contactUri   = Contacts.getLookupUri(cursor.getLong(2), cursor.getString(1));
-        String   name         = cursor.getString(3).equals(cursor.getString(0)) ? null : cursor.getString(0);
-        Drawable contactPhoto = ContactPhotoFactory.getContactPhoto(context,
-                                                                    Uri.withAppendedPath(Contacts.CONTENT_URI, cursor.getLong(2) + ""),
-                                                                    name);
-        return new RecipientDetails(cursor.getString(0), cursor.getString(3), contactUri, contactPhoto);
+        Uri          contactUri   = Contacts.getLookupUri(cursor.getLong(2), cursor.getString(1));
+        String       name         = cursor.getString(3).equals(cursor.getString(0)) ? null : cursor.getString(0);
+        ContactPhoto contactPhoto = ContactPhotoFactory.getContactPhoto(context,
+                                                                        Uri.withAppendedPath(Contacts.CONTENT_URI, cursor.getLong(2) + ""),
+                                                                        name);
+
+        return new RecipientDetails(cursor.getString(0), cursor.getString(3), contactUri, contactPhoto, color);
       }
     } finally {
       if (cursor != null)
         cursor.close();
     }
 
-    return new RecipientDetails(null, number, null, ContactPhotoFactory.getDefaultContactPhoto(context, null));
+    return new RecipientDetails(null, number, null, ContactPhotoFactory.getDefaultContactPhoto(null), color);
   }
 
-  private RecipientDetails getGroupRecipientDetails(Context context, String groupId) {
+  private @NonNull RecipientDetails getGroupRecipientDetails(Context context, String groupId) {
     try {
       GroupDatabase.GroupRecord record  = DatabaseFactory.getGroupDatabase(context)
                                                          .getGroup(GroupUtil.getDecodedId(groupId));
 
       if (record != null) {
-        Drawable avatar = ContactPhotoFactory.getGroupContactPhoto(context, record.getAvatar());
-        return new RecipientDetails(record.getTitle(), groupId, null, avatar);
+        ContactPhoto contactPhoto = ContactPhotoFactory.getGroupContactPhoto(record.getAvatar());
+        return new RecipientDetails(record.getTitle(), groupId, null, contactPhoto, null);
       }
 
-      return null;
+      return new RecipientDetails(null, groupId, null, ContactPhotoFactory.getDefaultGroupPhoto(), null);
     } catch (IOException e) {
       Log.w("RecipientProvider", e);
-      return null;
+      return new RecipientDetails(null, groupId, null, ContactPhotoFactory.getDefaultGroupPhoto(), null);
     }
   }
 
@@ -204,16 +183,21 @@ public class RecipientProvider {
   }
 
   public static class RecipientDetails {
-    public final String   name;
-    public final String   number;
-    public final Drawable avatar;
-    public final Uri      contactUri;
+    @Nullable public final String        name;
+    @NonNull  public final String        number;
+    @NonNull  public final ContactPhoto  avatar;
+    @Nullable public final Uri           contactUri;
+    @Nullable public final MaterialColor color;
 
-    public RecipientDetails(String name, String number, Uri contactUri, Drawable avatar) {
-      this.name          = name;
-      this.number        = number;
-      this.avatar        = avatar;
-      this.contactUri    = contactUri;
+    public RecipientDetails(@Nullable String name, @NonNull String number,
+                            @Nullable Uri contactUri, @NonNull ContactPhoto avatar,
+                            @Nullable MaterialColor color)
+    {
+      this.name       = name;
+      this.number     = number;
+      this.avatar     = avatar;
+      this.contactUri = contactUri;
+      this.color      = color;
     }
   }
 
@@ -232,6 +216,46 @@ public class RecipientProvider {
     public int hashCode() {
       return Arrays.hashCode(ids);
     }
+  }
+
+  private static class RecipientCache {
+
+    private final Map<Long,Recipient> cache = new LRUCache<>(1000);
+
+    public synchronized Recipient get(long recipientId) {
+      return cache.get(recipientId);
+    }
+
+    public synchronized void set(long recipientId, Recipient recipient) {
+      cache.put(recipientId, recipient);
+    }
+
+    public synchronized void reset() {
+      for (Recipient recipient : cache.values()) {
+        recipient.setStale();
+      }
+    }
+
+  }
+
+  private static class RecipientsCache {
+
+    private final Map<RecipientIds,Recipients> cache = new LRUCache<>(1000);
+
+    public synchronized Recipients get(RecipientIds ids) {
+      return cache.get(ids);
+    }
+
+    public synchronized void set(RecipientIds ids, Recipients recipients) {
+      cache.put(ids, recipients);
+    }
+
+    public synchronized void reset() {
+      for (Recipients recipients : cache.values()) {
+        recipients.setStale();
+      }
+    }
+
   }
 
 

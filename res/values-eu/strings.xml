@@ -41,6 +41,7 @@ gai izango da saiootan sartzeko.</string>
   <!--BlockedContactsActivity-->
   <!--ConfirmIdentityDialog-->
   <string name="ConfirmIdentityDialog_you_may_wish_to_verify_this_contact">Agian kontaktu hau egiaztatu beharko zenuke.</string>
+  <!--ContactsDatabase-->
   <!--ConversationItem-->
   <string name="ConversationItem_message_size_d_kb">Mezuaren tamaina: %d KB</string>
   <string name="ConversationItem_expires_s">Iraingutuko da: %s</string>
@@ -110,6 +111,8 @@ gai izango da saiootan sartzeko.</string>
   <!--CustomDefaultPreference-->
   <string name="CustomDefaultPreference_none">Bat ere ez</string>
   <!--DateUtils-->
+  <!--DeviceListActivity-->
+  <!--DeviceListItem-->
   <!--ShareActivity-->
   <string name="ShareActivity_share_with">Norekin konpartitu</string>
   <!--ExportFragment-->
@@ -308,6 +311,7 @@ Nortasun gako ezezagun batekin jaso da mezua. Klik egin prozesatzeko eta erakust
   <string name="MmsMessageRecord_decrypting_mms_please_wait">MMSa desenkriptatzen, mesedez itxaron...</string>
   <string name="MmsMessageRecord_bad_encrypted_mms_message">Gaizki enkriptatuko MMS mezua...</string>
   <string name="MmsMessageRecord_mms_message_encrypted_for_non_existing_session">MMS mezua enkriptatua esistitzen ez den saio baterako...</string>
+  <!--MuteDialog-->
   <!--ApplicationMigrationService-->
   <string name="ApplicationMigrationService_import_in_progress">Inportaketa indarrean</string>
   <string name="ApplicationMigrationService_importing_text_messages">Testu mezuak inportatzen</string>
@@ -317,16 +321,13 @@ Nortasun gako ezezagun batekin jaso da mezua. Klik egin prozesatzeko eta erakust
   <string name="KeyCachingService_passphrase_cached">TextSecure desblokeatuta dago</string>
   <string name="KeyCachingService_lock">Blokeatu pasahitz bat erabiliz</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_encrypted_message">Enkriptatuko mezua...</string>
   <string name="MessageNotifier_no_subject">(Ez dago gairik)</string>
   <string name="MessageNotifier_message_delivery_failed">Mezuaren banaketak huts egin du.</string>
   <string name="MessageNotifier_failed_to_deliver_message">Mezuaren banaketak huts egin du.</string>
   <string name="MessageNotifier_error_delivering_message">Errorea mezua banatzen.</string>
   <string name="MessageNotifier_mark_all_as_read">Denak irrakurritako gisa markatu</string>
-  <string name="MessageNotifier_mark_as_read">Irakurritako gisa markatu</string>
   <string name="MessageNotifier_media_message">Media mezua</string>
   <!--QuickResponseService-->
-  <string name="QuickResponseService_sorry_quick_response_is_not_yet_supported_by_textsecure">Barkatu, Quick Response momentuz ez dago onartuta TextSecuren!</string>
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">PASAHITZ ZAHARRA:</string>
   <string name="change_passphrase_activity__new_passphrase">PASAHITZ BERRIA:</string>
@@ -374,6 +375,7 @@ Nortasun gako ezezagun batekin jaso da mezua. Klik egin prozesatzeko eta erakust
   <!--country_selection_fragment-->
   <string name="country_selection_fragment__loading_countries">Herrialdeak kargatzen...</string>
   <string name="country_selection_fragment__search">Bilatu</string>
+  <!--device_list_fragment-->
   <!--log_submit_activity-->
   <string name="log_submit_activity__log_fetch_failed">Ezin izan dira logak eskuratu zure gailutik. ADB erabili dezakezu arazketa logak lortzeko.</string>
   <string name="log_submit_activity__thanks">Eskerrik asko zure laguntzagatik!</string>
@@ -515,7 +517,6 @@ huts egin du.
   <string name="preferences__change_passphrase">Pasahitza aldatu</string>
   <string name="preferences__change_my_passphrase">Nire pasahitza aldatu</string>
   <string name="preferences__enable_passphrase">Pasahitza gaitu</string>
-  <string name="preferences__enable_local_encryption_of_messages_and_keys">Mezuen eta gakoen enkriptatze lokala gaitu</string>
   <string name="preferences__screen_security">Pantailaren segurtasuna</string>
   <string name="preferences__disable_screen_security_to_allow_screen_shots">Blokeatu pantailazoak arestikoen zerrendan eta aplikazioaren barruan</string>
   <string name="preferences__forget_passphrase_from_memory_after_some_interval">Ahaztu pasahitza memoriatik denbora tarte bat pasa ondoren</string>
@@ -552,7 +553,6 @@ huts egin du.
   <string name="preferences__slow">Motela</string>
   <string name="preferences__custom">Pertsonalizatua</string>
   <string name="preferences__advanced">Aurreratua</string>
-  <string name="preferences__app_protection">Aplikazioaren babesa</string>
   <string name="preferences__advanced_mms_access_point_names">MMS eskuzko ezarpenak</string>
   <string name="preferences__enable_manual_mms">MMS eskuzko ezarpenak erabili</string>
   <string name="preferences__override_system_mms_settings">Jaramonik ez sistemaren MMS ezarpenei azpian dagoen informazioa erabiliz.</string>
@@ -616,6 +616,7 @@ huts egin du.
   <string name="conversation__menu_update_group">Taldea eguneratu</string>
   <string name="conversation__menu_leave_group">Taldea utzi</string>
   <string name="conversation__menu_delete_thread">Haria ezabatu</string>
+  <!--conversation_popup-->
   <!--conversation_callable-->
   <string name="conversation_add_to_contacts__menu_add_to_contacts">Kontaktuetara gehitu</string>
   <!--conversation_group_options-->
@@ -649,5 +650,6 @@ huts egin du.
   <string name="trimmer__deleting_old_messages">Mezu zaharrak ezabatzen...</string>
   <string name="trimmer__old_messages_successfully_deleted">Mezu zaharrak ondo ezabatu dira</string>
   <!--transport_selection_list_item-->
+  <!--quick_attachment_drawer-->
   <!--EOF-->
 </resources>

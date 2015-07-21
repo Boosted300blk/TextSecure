@@ -24,16 +24,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.components.ThumbnailView;
+import org.thoughtcrime.securesms.crypto.MasterSecret;
+import org.thoughtcrime.securesms.providers.CaptureProvider;
+import org.thoughtcrime.securesms.recipients.Recipients;
 import org.thoughtcrime.securesms.util.BitmapDecodingException;
 
-import java.io.File;
 import java.io.IOException;
 
 public class AttachmentManager {
@@ -42,16 +47,16 @@ public class AttachmentManager {
   private final Context            context;
   private final View               attachmentView;
   private final ThumbnailView      thumbnail;
-  private final Button             removeButton;
+  private final ImageView          removeButton;
   private final SlideDeck          slideDeck;
   private final AttachmentListener attachmentListener;
 
-  private File captureFile;
+  private Uri captureUri;
 
   public AttachmentManager(Activity view, AttachmentListener listener) {
     this.attachmentView     = view.findViewById(R.id.attachment_editor);
     this.thumbnail          = (ThumbnailView)view.findViewById(R.id.attachment_thumbnail);
-    this.removeButton       = (Button)view.findViewById(R.id.remove_image_button);
+    this.removeButton       = (ImageView)view.findViewById(R.id.remove_image_button);
     this.slideDeck          = new SlideDeck();
     this.context            = view;
     this.attachmentListener = listener;
@@ -60,18 +65,37 @@ public class AttachmentManager {
   }
 
   public void clear() {
-    slideDeck.clear();
-    attachmentView.setVisibility(View.GONE);
-    attachmentListener.onAttachmentChanged();
+    AlphaAnimation animation = new AlphaAnimation(1.0f, 0.0f);
+    animation.setDuration(200);
+    animation.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        slideDeck.clear();
+        attachmentView.setVisibility(View.GONE);
+        attachmentListener.onAttachmentChanged();
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+
+      }
+    });
+
+    attachmentView.startAnimation(animation);
   }
 
   public void cleanup() {
-    if (captureFile != null) captureFile.delete();
-    captureFile = null;
+    if (captureUri != null) CaptureProvider.getInstance(context).delete(captureUri);
+    captureUri = null;
   }
 
-  public void setImage(Uri image) throws IOException, BitmapDecodingException {
-    setMedia(new ImageSlide(context, image));
+  public void setImage(MasterSecret masterSecret, Uri image) throws IOException, BitmapDecodingException {
+    setMedia(new ImageSlide(context, masterSecret, image), masterSecret);
   }
 
   public void setVideo(Uri video) throws IOException, MediaTooLargeException {
@@ -83,10 +107,14 @@ public class AttachmentManager {
   }
 
   public void setMedia(final Slide slide) {
+    setMedia(slide, null);
+  }
+
+  public void setMedia(final Slide slide, @Nullable MasterSecret masterSecret) {
     slideDeck.clear();
     slideDeck.addSlide(slide);
     attachmentView.setVisibility(View.VISIBLE);
-    thumbnail.setImageResource(slide);
+    thumbnail.setImageResource(slide, masterSecret);
     attachmentListener.onAttachmentChanged();
   }
 
@@ -94,26 +122,9 @@ public class AttachmentManager {
     return attachmentView.getVisibility() == View.VISIBLE;
   }
 
+
   public SlideDeck getSlideDeck() {
     return slideDeck;
-  }
-
-  public File getCaptureFile() {
-    return captureFile;
-  }
-
-  public void capturePhoto(Activity activity, int requestCode) {
-    try {
-      Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-      if (captureIntent.resolveActivity(activity.getPackageManager()) != null) {
-        captureFile = File.createTempFile(String.valueOf(System.currentTimeMillis()), ".jpg", activity.getExternalFilesDir(null));
-        captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(captureFile));
-        activity.startActivityForResult(captureIntent, requestCode);
-      }
-    } catch (IOException e) {
-      Log.w(TAG, e);
-    }
   }
 
   public static void selectVideo(Activity activity, int requestCode) {
@@ -131,6 +142,28 @@ public class AttachmentManager {
   public static void selectContactInfo(Activity activity, int requestCode) {
     Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
     activity.startActivityForResult(intent, requestCode);
+  }
+
+  public Uri getCaptureUri() {
+    return captureUri;
+  }
+
+
+  public void setCaptureUri(Uri captureUri) {
+    this.captureUri = captureUri;
+  }
+
+  public void capturePhoto(Activity activity, Recipients recipients, int requestCode) {
+    try {
+      Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+      if (captureIntent.resolveActivity(activity.getPackageManager()) != null) {
+        captureUri = CaptureProvider.getInstance(context).createForExternal(recipients);
+        captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
+        activity.startActivityForResult(captureIntent, requestCode);
+      }
+    } catch (IOException ioe) {
+      Log.w(TAG, ioe);
+    }
   }
 
   private static void selectMediaType(Activity activity, String type, int requestCode) {
@@ -165,6 +198,6 @@ public class AttachmentManager {
   }
 
   public interface AttachmentListener {
-    public void onAttachmentChanged();
+    void onAttachmentChanged();
   }
 }

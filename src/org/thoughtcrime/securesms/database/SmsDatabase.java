@@ -213,10 +213,6 @@ public class SmsDatabase extends MessagingDatabase {
     updateTypeBitmask(id, Types.ENCRYPTION_MASK, Types.ENCRYPTION_REMOTE_NO_SESSION_BIT);
   }
 
-  public void markAsDecrypting(long id) {
-    updateTypeBitmask(id, Types.ENCRYPTION_MASK, Types.ENCRYPTION_REMOTE_BIT);
-  }
-
   public void markAsLegacyVersion(long id) {
     updateTypeBitmask(id, Types.ENCRYPTION_MASK, Types.ENCRYPTION_REMOTE_LEGACY_BIT);
   }
@@ -368,7 +364,7 @@ public class SmsDatabase extends MessagingDatabase {
       recipients = RecipientFactory.getRecipientsFromString(context, message.getSender(), true);
     } else {
       Log.w(TAG, "Sender is null, returning unknown recipient");
-      recipients = RecipientFactory.getRecipientsFor(context, Recipient.getUnknownRecipient(context), false);
+      recipients = RecipientFactory.getRecipientsFor(context, Recipient.getUnknownRecipient(), false);
     }
 
     Recipients groupRecipients;
@@ -461,7 +457,7 @@ public class SmsDatabase extends MessagingDatabase {
   }
 
   public Cursor getDecryptInProgressMessages() {
-    String where       = TYPE + " & " + (Types.ENCRYPTION_REMOTE_BIT | Types.ENCRYPTION_ASYMMETRIC_BIT) + " != 0";
+    String where       = TYPE + " & " + (Types.ENCRYPTION_ASYMMETRIC_BIT) + " != 0";
     SQLiteDatabase db  = databaseHelper.getReadableDatabase();
     return db.query(TABLE_NAME, MESSAGE_PROJECTION, where, null, null, null, null);
   }
@@ -615,13 +611,13 @@ public class SmsDatabase extends MessagingDatabase {
         Recipients recipients = RecipientFactory.getRecipientsFromString(context, address, false);
 
         if (recipients == null || recipients.isEmpty()) {
-          return RecipientFactory.getRecipientsFor(context, Recipient.getUnknownRecipient(context), false);
+          return RecipientFactory.getRecipientsFor(context, Recipient.getUnknownRecipient(), false);
         }
 
         return recipients;
       } else {
         Log.w(TAG, "getRecipientsFor() address is null");
-        return RecipientFactory.getRecipientsFor(context, Recipient.getUnknownRecipient(context), false);
+        return RecipientFactory.getRecipientsFor(context, Recipient.getUnknownRecipient(), false);
       }
     }
 

@@ -8,6 +8,7 @@ import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.database.MmsDatabase;
 import org.thoughtcrime.securesms.database.NoSuchMessageException;
+import org.thoughtcrime.securesms.database.PartDatabase;
 import org.thoughtcrime.securesms.dependencies.InjectableType;
 import org.thoughtcrime.securesms.mms.MediaConstraints;
 import org.thoughtcrime.securesms.mms.PartParser;
@@ -19,7 +20,7 @@ import org.thoughtcrime.securesms.transport.UndeliverableMessageException;
 import org.whispersystems.textsecure.api.TextSecureMessageSender;
 import org.whispersystems.textsecure.api.crypto.UntrustedIdentityException;
 import org.whispersystems.textsecure.api.messages.TextSecureAttachment;
-import org.whispersystems.textsecure.api.messages.TextSecureMessage;
+import org.whispersystems.textsecure.api.messages.TextSecureDataMessage;
 import org.whispersystems.textsecure.api.push.TextSecureAddress;
 import org.whispersystems.textsecure.api.push.exceptions.UnregisteredUserException;
 import org.whispersystems.textsecure.api.util.InvalidNumberException;
@@ -30,11 +31,14 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ws.com.google.android.mms.MmsException;
+import ws.com.google.android.mms.pdu.PduBody;
 import ws.com.google.android.mms.pdu.SendReq;
 
 import static org.thoughtcrime.securesms.dependencies.TextSecureCommunicationModule.TextSecureMessageSenderFactory;
 
 public class PushMediaSendJob extends PushSendJob implements InjectableType {
+
+  private static final long serialVersionUID = 1L;
 
   private static final String TAG = PushMediaSendJob.class.getSimpleName();
 
@@ -67,6 +71,7 @@ public class PushMediaSendJob extends PushSendJob implements InjectableType {
       database.markAsPush(messageId);
       database.markAsSecure(messageId);
       database.markAsSent(messageId, "push".getBytes(), 0);
+      markPartsUploaded(messageId, message.getBody());
     } catch (InsecureFallbackApprovalException ifae) {
       Log.w(TAG, ifae);
       database.markAsPendingInsecureSmsFallback(messageId);
@@ -95,12 +100,11 @@ public class PushMediaSendJob extends PushSendJob implements InjectableType {
     notifyMediaMessageDeliveryFailed(context, messageId);
   }
 
-
   private void deliver(MasterSecret masterSecret, SendReq message)
       throws RetryLaterException, InsecureFallbackApprovalException, UntrustedIdentityException,
              UndeliverableMessageException
   {
-    TextSecureMessageSender messageSender = messageSenderFactory.create(masterSecret);
+    TextSecureMessageSender messageSender = messageSenderFactory.create();
     String                  destination   = message.getTo()[0].getString();
 
     try {
@@ -109,11 +113,11 @@ public class PushMediaSendJob extends PushSendJob implements InjectableType {
       TextSecureAddress          address      = getPushAddress(destination);
       List<TextSecureAttachment> attachments  = getAttachments(masterSecret, message);
       String                     body         = PartParser.getMessageText(message.getBody());
-      TextSecureMessage          mediaMessage = TextSecureMessage.newBuilder()
-                                                                 .withBody(body)
-                                                                 .withAttachments(attachments)
-                                                                 .withTimestamp(message.getSentTimestamp())
-                                                                 .build();
+      TextSecureDataMessage      mediaMessage = TextSecureDataMessage.newBuilder()
+                                                                     .withBody(body)
+                                                                     .withAttachments(attachments)
+                                                                     .withTimestamp(message.getSentTimestamp())
+                                                                     .build();
 
       messageSender.sendMessage(address, mediaMessage);
     } catch (InvalidNumberException | UnregisteredUserException e) {

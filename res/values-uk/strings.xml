@@ -28,6 +28,7 @@
   <!--BlockedContactsActivity-->
   <!--ConfirmIdentityDialog-->
   <string name="ConfirmIdentityDialog_you_may_wish_to_verify_this_contact">Можливо, вам потрібно перевірити цей контакт.</string>
+  <!--ContactsDatabase-->
   <!--ConversationItem-->
   <string name="ConversationItem_message_size_d_kb">Розмір повідомленя: %d KБ</string>
   <string name="ConversationItem_expires_s">Минає: %s</string>
@@ -65,6 +66,8 @@
   <string name="ConversationListItem_key_exchange_message">Повідомлення обміну ключами\u2026</string>
   <!--CustomDefaultPreference-->
   <!--DateUtils-->
+  <!--DeviceListActivity-->
+  <!--DeviceListItem-->
   <!--ShareActivity-->
   <!--ExportFragment-->
   <string name="ExportFragment_export">Експортувати</string>
@@ -180,18 +183,17 @@
   <string name="MmsMessageRecord_decrypting_mms_please_wait">Розшифрування MMS, зачекайте, будь ласка\u2026</string>
   <string name="MmsMessageRecord_bad_encrypted_mms_message">Зашифроване MMS повідомлення зіпсоване\u2026</string>
   <string name="MmsMessageRecord_mms_message_encrypted_for_non_existing_session">MMS повідомлення зашифровано для неіснуючої сесії\u2026</string>
+  <!--MuteDialog-->
   <!--ApplicationMigrationService-->
   <string name="ApplicationMigrationService_import_in_progress">Триває імпортування</string>
   <!--KeyCachingService-->
   <string name="KeyCachingService_textsecure_passphrase_cached">Фраза-ключ TextSecure кешована</string>
   <string name="KeyCachingService_passphrase_cached">Фраза-ключ кешована</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_encrypted_message">Зашифроване повідомлення\u2026</string>
   <string name="MessageNotifier_message_delivery_failed">Збій доставки повідомлення.</string>
   <string name="MessageNotifier_failed_to_deliver_message">Не вдалось доставити повідомлення.</string>
   <string name="MessageNotifier_error_delivering_message">Помилка доставки повідомлення.</string>
   <string name="MessageNotifier_mark_all_as_read">Позначити все як прочитане</string>
-  <string name="MessageNotifier_mark_as_read">Позначити як прочитане</string>
   <!--QuickResponseService-->
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">СТАРА ФРАЗА-КЛЮЧ:</string>
@@ -222,6 +224,7 @@
   <!--country_selection_fragment-->
   <string name="country_selection_fragment__loading_countries">Завантаження країн\u2026</string>
   <string name="country_selection_fragment__search">Пошук</string>
+  <!--device_list_fragment-->
   <!--log_submit_activity-->
   <string name="log_submit_activity__log_fetch_failed">Не вдалось захопити журнал відлагодження. Натомість ви можете скористатись ADB, щоб це зробити.</string>
   <string name="log_submit_activity__thanks">Дякуємо за вашу допомогу!</string>
@@ -365,6 +368,7 @@
   <!--conversation-->
   <string name="conversation__menu_add_attachment">Додати вкладення</string>
   <string name="conversation__menu_delete_thread">Видалити розмову</string>
+  <!--conversation_popup-->
   <!--conversation_callable-->
   <!--conversation_group_options-->
   <string name="convesation_group_options__recipients_list">Список одержувачів</string>
@@ -384,5 +388,6 @@
   <!--media_preview_activity-->
   <!--Trimmer-->
   <!--transport_selection_list_item-->
+  <!--quick_attachment_drawer-->
   <!--EOF-->
 </resources>

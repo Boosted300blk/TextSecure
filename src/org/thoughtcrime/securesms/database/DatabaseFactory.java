@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import org.thoughtcrime.securesms.DatabaseUpgradeActivity;
+import org.thoughtcrime.securesms.contacts.ContactsDatabase;
 import org.thoughtcrime.securesms.crypto.DecryptingPartInputStream;
 import org.thoughtcrime.securesms.crypto.MasterCipher;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
@@ -45,24 +46,26 @@ import ws.com.google.android.mms.ContentType;
 
 public class DatabaseFactory {
 
-  private static final int INTRODUCED_IDENTITIES_VERSION      = 2;
-  private static final int INTRODUCED_INDEXES_VERSION         = 3;
-  private static final int INTRODUCED_DATE_SENT_VERSION       = 4;
-  private static final int INTRODUCED_DRAFTS_VERSION          = 5;
-  private static final int INTRODUCED_NEW_TYPES_VERSION       = 6;
-  private static final int INTRODUCED_MMS_BODY_VERSION        = 7;
-  private static final int INTRODUCED_MMS_FROM_VERSION        = 8;
-  private static final int INTRODUCED_TOFU_IDENTITY_VERSION   = 9;
-  private static final int INTRODUCED_PUSH_DATABASE_VERSION   = 10;
-  private static final int INTRODUCED_GROUP_DATABASE_VERSION  = 11;
-  private static final int INTRODUCED_PUSH_FIX_VERSION        = 12;
-  private static final int INTRODUCED_DELIVERY_RECEIPTS       = 13;
-  private static final int INTRODUCED_PART_DATA_SIZE_VERSION  = 14;
-  private static final int INTRODUCED_THUMBNAILS_VERSION      = 15;
-  private static final int INTRODUCED_IDENTITY_COLUMN_VERSION = 16;
-  private static final int INTRODUCED_UNIQUE_PART_IDS_VERSION = 17;
-  private static final int INTRODUCED_RECIPIENT_PREFS_DB      = 18;
-  private static final int DATABASE_VERSION                   = 18;
+  private static final int INTRODUCED_IDENTITIES_VERSION       = 2;
+  private static final int INTRODUCED_INDEXES_VERSION          = 3;
+  private static final int INTRODUCED_DATE_SENT_VERSION        = 4;
+  private static final int INTRODUCED_DRAFTS_VERSION           = 5;
+  private static final int INTRODUCED_NEW_TYPES_VERSION        = 6;
+  private static final int INTRODUCED_MMS_BODY_VERSION         = 7;
+  private static final int INTRODUCED_MMS_FROM_VERSION         = 8;
+  private static final int INTRODUCED_TOFU_IDENTITY_VERSION    = 9;
+  private static final int INTRODUCED_PUSH_DATABASE_VERSION    = 10;
+  private static final int INTRODUCED_GROUP_DATABASE_VERSION   = 11;
+  private static final int INTRODUCED_PUSH_FIX_VERSION         = 12;
+  private static final int INTRODUCED_DELIVERY_RECEIPTS        = 13;
+  private static final int INTRODUCED_PART_DATA_SIZE_VERSION   = 14;
+  private static final int INTRODUCED_THUMBNAILS_VERSION       = 15;
+  private static final int INTRODUCED_IDENTITY_COLUMN_VERSION  = 16;
+  private static final int INTRODUCED_UNIQUE_PART_IDS_VERSION  = 17;
+  private static final int INTRODUCED_RECIPIENT_PREFS_DB       = 18;
+  private static final int INTRODUCED_ENVELOPE_CONTENT_VERSION = 19;
+  private static final int INTRODUCED_COLOR_PREFERENCE_VERSION = 20;
+  private static final int DATABASE_VERSION                    = 20;
 
   private static final String DATABASE_NAME    = "messages.db";
   private static final Object lock             = new Object();
@@ -84,6 +87,7 @@ public class DatabaseFactory {
   private final PushDatabase pushDatabase;
   private final GroupDatabase groupDatabase;
   private final RecipientPreferenceDatabase recipientPreferenceDatabase;
+  private final ContactsDatabase contactsDatabase;
 
   public static DatabaseFactory getInstance(Context context) {
     synchronized (lock) {
@@ -146,6 +150,10 @@ public class DatabaseFactory {
     return getInstance(context).recipientPreferenceDatabase;
   }
 
+  public static ContactsDatabase getContactsDatabase(Context context) {
+    return getInstance(context).contactsDatabase;
+  }
+
   private DatabaseFactory(Context context) {
     this.databaseHelper              = new DatabaseHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
     this.sms                         = new SmsDatabase(context, databaseHelper);
@@ -161,6 +169,7 @@ public class DatabaseFactory {
     this.pushDatabase                = new PushDatabase(context, databaseHelper);
     this.groupDatabase               = new GroupDatabase(context, databaseHelper);
     this.recipientPreferenceDatabase = new RecipientPreferenceDatabase(context, databaseHelper);
+    this.contactsDatabase            = new ContactsDatabase(context);
   }
 
   public void reset(Context context) {
@@ -735,6 +744,14 @@ public class DatabaseFactory {
         db.execSQL("CREATE TABLE recipient_preferences " +
                    "(_id INTEGER PRIMARY KEY, recipient_ids TEXT UNIQUE, block INTEGER DEFAULT 0, " +
                    "notification TEXT DEFAULT NULL, vibrate INTEGER DEFAULT 0, mute_until INTEGER DEFAULT 0)");
+      }
+
+      if (oldVersion < INTRODUCED_ENVELOPE_CONTENT_VERSION) {
+        db.execSQL("ALTER TABLE push ADD COLUMN content TEXT");
+      }
+
+      if (oldVersion < INTRODUCED_COLOR_PREFERENCE_VERSION) {
+        db.execSQL("ALTER TABLE recipient_preferences ADD COLUMN color TEXT DEFAULT NULL");
       }
 
       db.setTransactionSuccessful();

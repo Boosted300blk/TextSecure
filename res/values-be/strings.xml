@@ -45,6 +45,7 @@
   <string name="ConfirmIdentityDialog_the_signature_on_this_key_exchange_is_different">Ідэнтыфікацыйны ключ для %1$s быў зменены. Гэта можа вызначаць, што нехта спрабуе перахапіць вашыя паведамленні, альбо проста %2$s пераўсталяваў па-новай TextSecure і зараз мае новы ідэнтыфікацыйны ключ.
     </string>
   <string name="ConfirmIdentityDialog_you_may_wish_to_verify_this_contact">Магчыма Вы жадаеце верыфікаваць гэты кантакт?</string>
+  <!--ContactsDatabase-->
   <!--ConversationItem-->
   <string name="ConversationItem_message_size_d_kb">Аб\'ём паведамлення: %d KB</string>
   <string name="ConversationItem_expires_s">Заканчваецца: %s</string>
@@ -126,6 +127,8 @@
   <string name="CustomDefaultPreference_none">Не</string>
   <!--DateUtils-->
   <string name="DateUtils_now">Зараз</string>
+  <!--DeviceListActivity-->
+  <!--DeviceListItem-->
   <!--ShareActivity-->
   <string name="ShareActivity_share_with">Падзяліцца з</string>
   <!--ExportFragment-->
@@ -325,6 +328,7 @@
   <string name="MmsMessageRecord_decrypting_mms_please_wait">РасшыфроўкаMMS, пачакайце калі ласка...</string>
   <string name="MmsMessageRecord_bad_encrypted_mms_message">Няправільна зашыфраванае MMS паведамленне...</string>
   <string name="MmsMessageRecord_mms_message_encrypted_for_non_existing_session">MMS паведамленне зашыфравана для ўжо неіснуючай сэсіі...</string>
+  <!--MuteDialog-->
   <!--ApplicationMigrationService-->
   <string name="ApplicationMigrationService_import_in_progress">Імпарт у працэсе</string>
   <string name="ApplicationMigrationService_importing_text_messages">Імпарт тэкставых паведамленняў</string>
@@ -334,17 +338,14 @@
   <string name="KeyCachingService_passphrase_cached">TextSecure разблакіравана</string>
   <string name="KeyCachingService_lock">Замкнуць гэты пароль</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_encrypted_message">Разшыфраванае паведамленне...</string>
   <string name="MessageNotifier_media_message_with_text">Мультымедыя паведамленне: %s</string>
   <string name="MessageNotifier_no_subject">(Няма тэмы)</string>
   <string name="MessageNotifier_message_delivery_failed">Памылка дастаўкі паведамлення.</string>
   <string name="MessageNotifier_failed_to_deliver_message">Памылка дастаўкі паведамлення.</string>
   <string name="MessageNotifier_error_delivering_message">Памылка дастаўкі паведамлення.</string>
   <string name="MessageNotifier_mark_all_as_read">Пазначыць усе як прачытаныя</string>
-  <string name="MessageNotifier_mark_as_read">Пазначыць як прачытанае</string>
   <string name="MessageNotifier_media_message">Мультымедыя паведамленне</string>
   <!--QuickResponseService-->
-  <string name="QuickResponseService_sorry_quick_response_is_not_yet_supported_by_textsecure">Нажаль Quick Response больш не падтрымліваецца TextSecure!</string>
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">СТАРЫ ПАРОЛЬ:</string>
   <string name="change_passphrase_activity__new_passphrase">НОВЫ ПАРОЛЬ:</string>
@@ -394,6 +395,7 @@
   <!--country_selection_fragment-->
   <string name="country_selection_fragment__loading_countries">Загрузка краінаў...</string>
   <string name="country_selection_fragment__search">Пошук</string>
+  <!--device_list_fragment-->
   <!--log_submit_activity-->
   <string name="log_submit_activity__log_fetch_failed">Не атрымалася ўзяць логі з вашай прылады. Вы па-ранейшаму можаце выкарыстоўваць ADB, каб атрымаць логі замест гэтага.</string>
   <string name="log_submit_activity__thanks">Дзякуй за вашу дапамогу!</string>
@@ -550,7 +552,6 @@ TextSecure не дачакаўся параверачная SMS.</string>
   <string name="preferences__change_my_passphrase">Змяніць мой пароль</string>
   <string name="preferences__enable_passphrase">Уключыць пароль</string>
   <string name="preferences__passphrase_summary">Пароль %s</string>
-  <string name="preferences__enable_local_encryption_of_messages_and_keys">Уключыць лакальнае шыфраванне паведамленняў і ключоў</string>
   <string name="preferences__screen_security">Бяспека экрана</string>
   <string name="preferences__screen_security_summary">Бяспека экрана %s</string>
   <string name="preferences__disable_screen_security_to_allow_screen_shots">Блакіраваць магчымасць рабіць скрыншоты ўнутры праграмы</string>
@@ -595,7 +596,6 @@ TextSecure не дачакаўся параверачная SMS.</string>
   <string name="preferences__slow">Павольна</string>
   <string name="preferences__custom">Пэўны</string>
   <string name="preferences__advanced">Прасунуты</string>
-  <string name="preferences__app_protection">Абарона аплікацыі</string>
   <string name="preferences__mms_user_agent">MMS User Agent</string>
   <string name="preferences__advanced_mms_access_point_names">Ручныя налады MMS</string>
   <string name="preferences__enable_manual_mms">Выкарыстоўваць ручныя налады MMS</string>
@@ -675,6 +675,7 @@ TextSecure не дачакаўся параверачная SMS.</string>
   <string name="conversation__menu_leave_group">Пакінуць групу</string>
   <string name="conversation__menu_delete_thread">Выдаліць ланцужок</string>
   <string name="conversation__menu_view_media">Усе выявы</string>
+  <!--conversation_popup-->
   <!--conversation_callable-->
   <string name="conversation_add_to_contacts__menu_add_to_contacts">Дадаць да кантактаў</string>
   <!--conversation_group_options-->
@@ -714,5 +715,6 @@ TextSecure не дачакаўся параверачная SMS.</string>
   <string name="trimmer__old_messages_successfully_deleted">Старыя паведамленні паспяхова выдалены</string>
   <!--transport_selection_list_item-->
   <string name="transport_selection_list_item__transport_icon">Транспартны значок</string>
+  <!--quick_attachment_drawer-->
   <!--EOF-->
 </resources>

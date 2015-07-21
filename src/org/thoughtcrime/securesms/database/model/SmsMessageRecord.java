@@ -50,7 +50,7 @@ public class SmsMessageRecord extends MessageRecord {
                           int status, List<IdentityKeyMismatch> mismatches)
   {
     super(context, id, body, recipients, individualRecipient, recipientDeviceId,
-          dateSent, dateReceived, threadId, receiptCount, getGenericDeliveryStatus(status), type,
+          dateSent, dateReceived, threadId, getGenericDeliveryStatus(status), receiptCount, type,
           mismatches, new LinkedList<NetworkFailure>());
   }
 
@@ -87,7 +87,7 @@ public class SmsMessageRecord extends MessageRecord {
     } else if (SmsDatabase.Types.isNoRemoteSessionType(type)) {
       return emphasisAdded(context.getString(R.string.MessageDisplayHelper_message_encrypted_for_non_existing_session));
     } else if (!getBody().isPlaintext()) {
-      return emphasisAdded(context.getString(R.string.MessageNotifier_encrypted_message));
+      return emphasisAdded(context.getString(R.string.MessageNotifier_locked_message));
     } else if (SmsDatabase.Types.isEndSessionType(type)) {
       return emphasisAdded(context.getString(R.string.SmsMessageRecord_secure_session_ended));
     } else {

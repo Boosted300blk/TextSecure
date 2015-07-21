@@ -29,6 +29,7 @@ Cảnh báo, điều này tắt mã hóa lưu trữ cho tất cả tin nhắn v�
   <string name="ConfirmIdentityDialog_you_may_wish_to_verify_this_contact">Bạn có thể muốn kiểm chứng
 địa chỉ liên lạc này.
     </string>
+  <!--ContactsDatabase-->
   <!--ConversationItem-->
   <string name="ConversationItem_message_size_d_kb">Kích thước tin nhắn: %d KB</string>
   <string name="ConversationItem_expires_s">Hết hạn: %s</string>
@@ -79,6 +80,8 @@ Cảnh báo, điều này tắt mã hóa lưu trữ cho tất cả tin nhắn v�
   <!--CustomDefaultPreference-->
   <string name="CustomDefaultPreference_none">Không</string>
   <!--DateUtils-->
+  <!--DeviceListActivity-->
+  <!--DeviceListItem-->
   <!--ShareActivity-->
   <string name="ShareActivity_share_with">Chia sẻ với</string>
   <!--ExportFragment-->
@@ -227,6 +230,7 @@ Nhận thông tin về chìa khóa nhận diện không rõ. Bấm để xử l�
   <string name="MmsMessageRecord_decrypting_mms_please_wait">Giải mã MMS, xin chờ...</string>
   <string name="MmsMessageRecord_bad_encrypted_mms_message">Tin nhắn MMS mã hóa bị hỏng...</string>
   <string name="MmsMessageRecord_mms_message_encrypted_for_non_existing_session">Tin nhắn MMS được mã hóa cho phiên trao đổi không tồn tại...</string>
+  <!--MuteDialog-->
   <!--ApplicationMigrationService-->
   <string name="ApplicationMigrationService_import_in_progress">Đang tiến hành việc nhập vào</string>
   <!--KeyCachingService-->
@@ -235,14 +239,11 @@ Nhận thông tin về chìa khóa nhận diện không rõ. Bấm để xử l�
   <string name="KeyCachingService_passphrase_cached">TextSecure được mở khóa</string>
   <string name="KeyCachingService_lock">Khóa bằng mật khẩu</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_encrypted_message">Mã hóa tin nhắn...</string>
   <string name="MessageNotifier_message_delivery_failed">Phân phối tin nhắn bị thất bại.</string>
   <string name="MessageNotifier_failed_to_deliver_message">Thất bại trong việc phân phối tin.</string>
   <string name="MessageNotifier_error_delivering_message">Có lỗi khi phân phối tin.</string>
   <string name="MessageNotifier_mark_all_as_read">Đánh dấu tất cả đã đọc</string>
-  <string name="MessageNotifier_mark_as_read">Đánh dấu đã đọc</string>
   <!--QuickResponseService-->
-  <string name="QuickResponseService_sorry_quick_response_is_not_yet_supported_by_textsecure">Xin lỗi, Hồi Âm Nhanh chưa được TextSecure hỗ trợ!</string>
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">MẬT KHẨU CŨ:</string>
   <string name="change_passphrase_activity__new_passphrase">MẬT KHẨU MỚI:</string>
@@ -277,6 +278,7 @@ Nhận thông tin về chìa khóa nhận diện không rõ. Bấm để xử l�
   <!--country_selection_fragment-->
   <string name="country_selection_fragment__loading_countries">Nạp tên quốc gia...</string>
   <string name="country_selection_fragment__search">Tìm kiếm</string>
+  <!--device_list_fragment-->
   <!--log_submit_activity-->
   <string name="log_submit_activity__log_fetch_failed">Không lấy được ký sự từ thiết bị của bạn. Thay vào đó, bạn có thể dùng ADB để lấy ký sự gỡ lỗi (debug).</string>
   <string name="log_submit_activity__thanks">Cám ơn sự trợ giúp của bạn!</string>
@@ -448,6 +450,7 @@ TextSecure hết hạn chờ trong lúc đợi tin nhắn SMS xác nhận.</stri
   <string name="conversation__menu_add_attachment">Thêm tập tin đính kèm</string>
   <string name="conversation__menu_update_group">Cập nhật nhóm</string>
   <string name="conversation__menu_delete_thread">Xóa luồng</string>
+  <!--conversation_popup-->
   <!--conversation_callable-->
   <!--conversation_group_options-->
   <string name="convesation_group_options__recipients_list">Danh sách người nhận</string>
@@ -468,5 +471,6 @@ TextSecure hết hạn chờ trong lúc đợi tin nhắn SMS xác nhận.</stri
   <!--media_preview_activity-->
   <!--Trimmer-->
   <!--transport_selection_list_item-->
+  <!--quick_attachment_drawer-->
   <!--EOF-->
 </resources>

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 
 import org.thoughtcrime.securesms.ConversationActivity;
+import org.thoughtcrime.securesms.ConversationPopupActivity;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.Recipients;
 import org.thoughtcrime.securesms.util.Util;
@@ -35,8 +36,8 @@ public class NotificationItem {
     this.timestamp           = timestamp;
   }
 
-  public @Nullable Recipients getRecipients() {
-    return threadRecipients;
+  public Recipients getRecipients() {
+    return threadRecipients == null ? recipients : threadRecipients;
   }
 
   public Recipient getIndividualRecipient() {
@@ -81,8 +82,7 @@ public class NotificationItem {
   }
 
   public PendingIntent getPendingIntent(Context context) {
-    Intent intent = new Intent(context, ConversationActivity.class);
-
+    Intent     intent           = new Intent(context, ConversationActivity.class);
     Recipients notifyRecipients = threadRecipients != null ? threadRecipients : recipients;
     if (notifyRecipients != null) intent.putExtra("recipients", notifyRecipients.getIds());
 
@@ -91,5 +91,6 @@ public class NotificationItem {
 
     return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
+
 
 }
