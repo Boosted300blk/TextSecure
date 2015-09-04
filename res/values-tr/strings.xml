@@ -12,11 +12,6 @@
   <string name="ApplicationPreferencesActivity_delete_all_old_messages_now">Tüm eski mesajlar silinsin mi?</string>
   <string name="ApplicationPreferencesActivity_are_you_sure_you_would_like_to_immediately_trim_all_conversation_threads_to_the_s_most_recent_messages">Tüm konuşma başlıklarını hemen  %s en son konuşmaya kırpmak istediğinizden emin misiniz?</string>
   <string name="ApplicationPreferencesActivity_delete">Sil</string>
-  <string name="ApplicationPreferencesActivity_disable_storage_encryption">Saklama alanı şifrelemesi etkisizleştirilsin mi?</string>
-  <string name="ApplicationPreferencesActivity_warning_this_will_disable_storage_encryption_for_all_messages">
-Uyarı, bu tüm mesaj ve anahtarlar için depolama alanı şifrelemesini etkisizleştirir. Şifrelenmiş
-oturumlarınız işlevlerini sürdürür, fakat cihazınıza fiziksel erişimi olan herhangi biri onlara
-erişebilir.</string>
   <string name="ApplicationPreferencesActivity_disable">Etkisizleştir</string>
   <string name="ApplicationPreferencesActivity_unregistering">Kayıt siliniyor</string>
   <string name="ApplicationPreferencesActivity_unregistering_from_textsecure_messages">TextSecure mesajlarından kaydınız siliniyor</string>
@@ -42,7 +37,6 @@ Gelecekte TextSecure mesajlarını tekrar kullanmak isterseniz telefon numaranı
   <!--AttchmentManager-->
   <string name="AttachmentManager_cant_open_media_selection">Seçtiğiniz medya için bir uygulama bulunamadı.</string>
   <!--AttachmentTypeSelectorAdapter-->
-  <string name="AttachmentTypeSelectorAdapter_take_photo">Foto Çek</string>
   <string name="AttachmentTypeSelectorAdapter_picture">Resim</string>
   <string name="AttachmentTypeSelectorAdapter_video">Görüntü</string>
   <string name="AttachmentTypeSelectorAdapter_audio">Ses</string>
@@ -230,8 +224,6 @@ kurulumunuzda bulunan ancak yüklenecek yedekte bulunmayan tüm bilgiler kaybolu
   <string name="DeviceProvisioningActivity_content_bullets">
 - Tüm mesajlarınızı okuyunuz
 \n-Mesajları adınızla gönderiniz</string>
-  <string name="DeviceProvisioningActivity_content_progress_content">Yeni cihaz ekleniyor...</string>
-  <string name="DeviceProvisioningActivity_content_progress_success">Cihaz eklendi!</string>
   <string name="DeviceProvisioningActivity_content_progress_no_device">Hiç cihaz bulanamadı.</string>
   <string name="DeviceProvisioningActivity_content_progress_network_error">Ağ hatası.</string>
   <string name="DeviceProvisioningActivity_content_progress_key_error">Geçersiz QR kodu.</string>
@@ -365,7 +357,6 @@ Bilinmeyen kimlik anahtarı içeren bir mesaj alındı. İşlemek ve görüntül
   <string name="KeyCachingService_passphrase_cached">TextSecure kilitsiz</string>
   <string name="KeyCachingService_lock">Parola ile kilitle</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_d_messages_in_d_conversations">%2$d sohbette %1$d mesaj</string>
   <string name="MessageNotifier_most_recent_from_s">En yeni mesaj: %1$s</string>
   <string name="MessageNotifier_media_message_with_text">Medya mesajı: %s</string>
   <string name="MessageNotifier_no_subject">(Konusuz)</string>
@@ -375,18 +366,16 @@ Bilinmeyen kimlik anahtarı içeren bir mesaj alındı. İşlemek ve görüntül
   <string name="MessageNotifier_mark_all_as_read">Tümünü okundu işaretle</string>
   <string name="MessageNotifier_media_message">Medya mesajı</string>
   <!--QuickResponseService-->
+  <!--SingleRecipientNotificationBuilder-->
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">ESKİ PAROLA:</string>
   <string name="change_passphrase_activity__new_passphrase">YENİ PAROLA:</string>
   <string name="change_passphrase_activity__repeat_new_passphrase">YENİ PAROLA TEKRAR:</string>
+  <!--contact_selection_activity-->
   <!--contact_selection_group_activity-->
-  <!--contact_selection_list_activity-->
   <string name="contact_selection_group_activity__no_contacts">Kişi yok.</string>
   <string name="contact_selection_group_activity__finding_contacts">Kişiler yükleniyor...</string>
   <!--single_contact_selection_activity-->
-  <string name="SingleContactSelectionActivity_you_are_not_registered_with_the_push_service">İtilen servisine kayıtlı değilsiniz...</string>
-  <string name="SingleContactSelectionActivity_updating_directory">Dizin güncelleniyor</string>
-  <string name="SingleContactSelectionActivity_updating_push_directory">İtilen dizini güncelleniyor...</string>
   <string name="SingleContactSelectionActivity_contact_photo">Kişi Fotosu</string>
   <!--ContactSelectionListFragment-->
   <string name="ContactSelectionlistFragment_select_for">Seç</string>
@@ -602,7 +591,6 @@ başarısız.</string>
   <string name="preferences__pref_timeout_interval_title">Zaman aşımı aralığı</string>
   <string name="preferences__the_amount_of_time_to_wait_before_forgetting_passphrase">Hafızadaki parolanın unutulması için geçmesi gereken zaman miktarı</string>
   <string name="preferences__notifications">Bildirimler</string>
-  <string name="preferences__display_message_notifications_in_status_bar">Durum çubuğunda mesaj bildirimlerini göster</string>
   <string name="preferences__led_color">LED rengi</string>
   <string name="preferences__led_color_unknown">Bilinmeyen</string>
   <string name="preferences__pref_led_blink_title">LED yanıp sönme şekli</string>

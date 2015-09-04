@@ -1,17 +1,22 @@
 package org.thoughtcrime.securesms.mms;
 
 import android.content.Context;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.util.Log;
 import android.util.Pair;
 
+import com.bumptech.glide.Glide;
+
 import org.thoughtcrime.securesms.crypto.MasterSecret;
+import org.thoughtcrime.securesms.mms.DecryptableStreamUriLoader.DecryptableUri;
 import org.thoughtcrime.securesms.util.BitmapDecodingException;
 import org.thoughtcrime.securesms.util.BitmapUtil;
 import org.thoughtcrime.securesms.util.MediaUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 
 import ws.com.google.android.mms.pdu.PduPart;
 
@@ -25,15 +30,18 @@ public abstract class MediaConstraints {
   public abstract int getImageMaxHeight(Context context);
   public abstract int getImageMaxSize();
 
+  public abstract int getGifMaxSize();
+
   public abstract int getVideoMaxSize();
 
   public abstract int getAudioMaxSize();
 
   public boolean isSatisfied(Context context, MasterSecret masterSecret, PduPart part) {
     try {
-      return (MediaUtil.isImage(part) && part.getDataSize() <= getImageMaxSize() && isWithinBounds(context, masterSecret, part.getDataUri())) ||
-             (MediaUtil.isAudio(part) && part.getDataSize() <= getAudioMaxSize()) ||
-             (MediaUtil.isVideo(part) && part.getDataSize() <= getVideoMaxSize()) ||
+      return (MediaUtil.isGif(part)    && part.getDataSize() <= getGifMaxSize()   && isWithinBounds(context, masterSecret, part.getDataUri())) ||
+             (MediaUtil.isImage(part)  && part.getDataSize() <= getImageMaxSize() && isWithinBounds(context, masterSecret, part.getDataUri())) ||
+             (MediaUtil.isAudio(part)  && part.getDataSize() <= getAudioMaxSize()) ||
+             (MediaUtil.isVideo(part)  && part.getDataSize() <= getVideoMaxSize()) ||
              (!MediaUtil.isImage(part) && !MediaUtil.isAudio(part) && !MediaUtil.isVideo(part));
     } catch (IOException ioe) {
       Log.w(TAG, "Failed to determine if media's constraints are satisfied.", ioe);
@@ -49,7 +57,7 @@ public abstract class MediaConstraints {
   }
 
   public boolean canResize(PduPart part) {
-    return part != null && MediaUtil.isImage(part);
+    return part != null && MediaUtil.isImage(part) && !MediaUtil.isGif(part);
   }
 
   public byte[] getResizedMedia(Context context, MasterSecret masterSecret, PduPart part)
@@ -58,15 +66,10 @@ public abstract class MediaConstraints {
     if (!canResize(part) || part.getDataUri() == null) {
       throw new UnsupportedOperationException("Cannot resize this content type");
     }
-
     try {
-      return BitmapUtil.createScaledBytes(context, masterSecret, part.getDataUri(),
-                                          getImageMaxWidth(context),
-                                          getImageMaxHeight(context),
-                                          getImageMaxSize());
-    } catch (BitmapDecodingException bde) {
-      throw new IOException(bde);
+      return BitmapUtil.createScaledBytes(context, new DecryptableUri(masterSecret, part.getDataUri()), this);
+    } catch (ExecutionException ee) {
+      throw new IOException(ee);
     }
   }
-
 }

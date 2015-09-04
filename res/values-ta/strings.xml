@@ -12,11 +12,6 @@
   <string name="ApplicationPreferencesActivity_delete_all_old_messages_now">அனைத்து பழைய செய்திகளையும் நீக்கலாமா?</string>
   <string name="ApplicationPreferencesActivity_are_you_sure_you_would_like_to_immediately_trim_all_conversation_threads_to_the_s_most_recent_messages">நீங்கள் உடனடியாக  உரையாடல் நூல்களிலுள்ள மிக சமீபத்திய %s செய்திகளுக்கு முன் உள்ள செய்திகளை நீக்குவதற்கு உறுதி செய்கிறீர்களா?</string>
   <string name="ApplicationPreferencesActivity_delete">நீக்கு</string>
-  <string name="ApplicationPreferencesActivity_disable_storage_encryption">சேமிப்பின் மறையாகத்தை முடக்கலாமா?</string>
-  <string name="ApplicationPreferencesActivity_warning_this_will_disable_storage_encryption_for_all_messages">
-எச்சரிக்கை, இது அனைத்து செய்திகள் மற்றும் சாவிகளின் சேமிப்பு மறையாக்கத்தை முடக்கும். உங்களின்
-மறையாக்கப்பட்ட அமர்வுகள் செயல்பட தொடரும், ஆனால் உங்கள் தொலைபேசியை 
-கையாளகக்கூடிபவர் எவரும் அவற்றை அணுகலாம்.</string>
   <string name="ApplicationPreferencesActivity_disable">முடக்கு</string>
   <string name="ApplicationPreferencesActivity_error_connecting_to_server">சர்வருடன் இணைவதில் பிழை!</string>
   <string name="ApplicationPreferencesActivity_touch_to_change_your_default_sms_app">இதை உங்கள் இயல்புநிலை SMS மென்பொருளாக்க தொடவும் </string>
@@ -218,8 +213,6 @@ SMS-களை இறக்குமதி செய்திருந்தா�
   <string name="DeviceProvisioningActivity_content_bullets">
 - அனைத்த்து குறுஞ்செய்திகளை படிக்கமுடியும்
 \n- உங்கள் பெயர்கொண்டு செய்திகளை அனுப்பமுடியும்</string>
-  <string name="DeviceProvisioningActivity_content_progress_content">புதிய சாதனம் சேர்க்கப்படுகிறது...</string>
-  <string name="DeviceProvisioningActivity_content_progress_success">சாதனம் சேர்க்கப்பட்டது!</string>
   <string name="DeviceProvisioningActivity_content_progress_no_device">எந்த சாதனமும் காணப்படவில்லை.</string>
   <string name="DeviceProvisioningActivity_content_progress_network_error">இணையத்தில் பிழை.</string>
   <string name="DeviceProvisioningActivity_content_progress_key_error">QR குறியீடு செல்லாது.</string>
@@ -355,18 +348,16 @@ SMS-களை இறக்குமதி செய்திருந்தா�
   <string name="MessageNotifier_mark_all_as_read">அனைத்தையும் படித்தாக குறியிடு</string>
   <string name="MessageNotifier_media_message">மீடியா செய்தி</string>
   <!--QuickResponseService-->
+  <!--SingleRecipientNotificationBuilder-->
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">பழைய கடவுச்சொல்:</string>
   <string name="change_passphrase_activity__new_passphrase">புதிய கடவுச்சொல்:</string>
   <string name="change_passphrase_activity__repeat_new_passphrase">மீண்டும் புதிய கடவுச்சொல்:</string>
+  <!--contact_selection_activity-->
   <!--contact_selection_group_activity-->
-  <!--contact_selection_list_activity-->
   <string name="contact_selection_group_activity__no_contacts">தொடர்புகள் இல்லை.</string>
   <string name="contact_selection_group_activity__finding_contacts">தொடர்புகள் ஏற்றுப்படுகிறது...</string>
   <!--single_contact_selection_activity-->
-  <string name="SingleContactSelectionActivity_you_are_not_registered_with_the_push_service">நீங்கள் Push சேவையில் பதிவுசெய்யவில்லை...</string>
-  <string name="SingleContactSelectionActivity_updating_directory">அடைவு புதுப்பிக்கப்படுகிறது</string>
-  <string name="SingleContactSelectionActivity_updating_push_directory">Push அடைவு புதுப்பிக்கப்படுகிறது...</string>
   <string name="SingleContactSelectionActivity_contact_photo">தொடர்பின் புகைப்படம்</string>
   <!--ContactSelectionListFragment-->
   <string name="ContactSelectionlistFragment_select_for">இவருக்காக தேர்வு</string>
@@ -584,7 +575,6 @@ TextSecure சரிபார்ப்பு SMS-செய்திக்கா�
   <string name="preferences__pref_timeout_interval_title">காலாவதி நேரம்</string>
   <string name="preferences__the_amount_of_time_to_wait_before_forgetting_passphrase">நினைவகத்திலிருந்து கடவுச்சொல்லை மறக்கச்செய்யும் முன் காத்திருக்கவேண்டிய நேர அளவு</string>
   <string name="preferences__notifications">அறிவிப்புகள்</string>
-  <string name="preferences__display_message_notifications_in_status_bar">செய்தி அறிவிப்புகளை நிலைப்பட்டையில் காண்பிக்கவும்</string>
   <string name="preferences__led_color">LED நிறம்</string>
   <string name="preferences__led_color_unknown">முன் தெரிந்திராத</string>
   <string name="preferences__pref_led_blink_title">LED மிளிரும் முறை</string>

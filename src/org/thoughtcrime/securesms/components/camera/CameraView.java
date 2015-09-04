@@ -19,6 +19,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Build;
@@ -68,6 +69,7 @@ public class CameraView extends FrameLayout {
 
   public CameraView(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
+    setBackgroundColor(Color.BLACK);
 
     onOrientationChange = new OnOrientationChange(context.getApplicationContext());
   }
@@ -137,9 +139,7 @@ public class CameraView extends FrameLayout {
       }
 
       @Override protected Void onRunBackground() {
-        if (camera != null) {
-          previewDestroyed();
-        }
+        previewDestroyed();
         return null;
       }
 
@@ -441,7 +441,7 @@ public class CameraView extends FrameLayout {
     ApplicationContext.getInstance(getContext()).getJobManager().add(job);
   }
 
-  private abstract class SerializedAsyncTask<Result> extends Job {
+  private static abstract class SerializedAsyncTask<Result> extends Job {
 
     public SerializedAsyncTask() {
       super(JobParameters.newBuilder().withGroupId(CameraView.class.getSimpleName()).create());

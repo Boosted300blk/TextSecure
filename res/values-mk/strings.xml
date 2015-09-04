@@ -12,12 +12,6 @@
   <string name="ApplicationPreferencesActivity_delete_all_old_messages_now">Избришете ги сите стари пораки?</string>
   <string name="ApplicationPreferencesActivity_are_you_sure_you_would_like_to_immediately_trim_all_conversation_threads_to_the_s_most_recent_messages">Дали сте сигурни дека сакате да се скратат сите теми на разговор на %s од најновите пораки?</string>
   <string name="ApplicationPreferencesActivity_delete">Избриши</string>
-  <string name="ApplicationPreferencesActivity_disable_storage_encryption">Оневозможи енкрипција на локацијата за трајно снимање?</string>
-  <string name="ApplicationPreferencesActivity_warning_this_will_disable_storage_encryption_for_all_messages">
-        Внимание, ова ќе го оневозможи шифрирањето на локацијата за трајно снимање за сите пораки и клучеви. Вашите шифрирани
-        сесии ќе продолжат да функционираат, но секој со физички пристап до вашиот уред ќе може да
-        пристапи до нив.
-    </string>
   <string name="ApplicationPreferencesActivity_disable">Оневозможи</string>
   <string name="ApplicationPreferencesActivity_unregistering">Одјавување</string>
   <string name="ApplicationPreferencesActivity_unregistering_from_textsecure_messages">Одвјавување од TextSecure пораки...</string>
@@ -45,7 +39,6 @@
   <!--AttchmentManager-->
   <string name="AttachmentManager_cant_open_media_selection">Не постои апликација за избор на датотеки.</string>
   <!--AttachmentTypeSelectorAdapter-->
-  <string name="AttachmentTypeSelectorAdapter_take_photo">Сликај</string>
   <string name="AttachmentTypeSelectorAdapter_picture">Слика</string>
   <string name="AttachmentTypeSelectorAdapter_video">Видео</string>
   <string name="AttachmentTypeSelectorAdapter_audio">Звук</string>
@@ -243,9 +236,6 @@
         - Чита сите ваши пораки
         \n- Праќа пораки во ваше име
     </string>
-  <string name="DeviceProvisioningActivity_content_progress_title">Додавам уред</string>
-  <string name="DeviceProvisioningActivity_content_progress_content">Додавање нов уред...</string>
-  <string name="DeviceProvisioningActivity_content_progress_success">Уредот е додаден!</string>
   <string name="DeviceProvisioningActivity_content_progress_no_device">Уредот не е пронајден.</string>
   <string name="DeviceProvisioningActivity_content_progress_network_error">Мрежна грешка.</string>
   <string name="DeviceProvisioningActivity_content_progress_key_error">Погрешен QR код.</string>
@@ -387,7 +377,6 @@
   <string name="KeyCachingService_passphrase_cached">TextSecure е отклучен.</string>
   <string name="KeyCachingService_lock">Заклучете со лозинка</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_d_messages_in_d_conversations">%1$d пораки во %2$d теми</string>
   <string name="MessageNotifier_most_recent_from_s">Најнови од: %1$s</string>
   <string name="MessageNotifier_media_message_with_text">Медиа порака: %s</string>
   <string name="MessageNotifier_no_subject">(Без наслов)</string>
@@ -397,18 +386,16 @@
   <string name="MessageNotifier_mark_all_as_read">Обележи ги сите како прочитани</string>
   <string name="MessageNotifier_media_message">Медиа порака</string>
   <!--QuickResponseService-->
+  <!--SingleRecipientNotificationBuilder-->
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">СТАРА ЛОЗИНКА:</string>
   <string name="change_passphrase_activity__new_passphrase">НОВА ЛОЗИНКА:</string>
   <string name="change_passphrase_activity__repeat_new_passphrase">ПОВТОРЕТЕ ЈА НОВАТА ЛОЗИНКА:</string>
+  <!--contact_selection_activity-->
   <!--contact_selection_group_activity-->
-  <!--contact_selection_list_activity-->
   <string name="contact_selection_group_activity__no_contacts">Нема контакти.</string>
   <string name="contact_selection_group_activity__finding_contacts">Контактите се вчитуваат...</string>
   <!--single_contact_selection_activity-->
-  <string name="SingleContactSelectionActivity_you_are_not_registered_with_the_push_service">Не сте регистрирани за TextSecure услугата.</string>
-  <string name="SingleContactSelectionActivity_updating_directory">Ажурирање</string>
-  <string name="SingleContactSelectionActivity_updating_push_directory">Ажурирање на контакт листата...</string>
   <string name="SingleContactSelectionActivity_contact_photo">Слика на контакт</string>
   <!--ContactSelectionListFragment-->
   <string name="ContactSelectionlistFragment_select_for">Изберете за</string>
@@ -640,7 +627,6 @@ TextSecure автоматски ќе го провери вашиот број �
   <string name="preferences__pref_timeout_interval_title">Интервал за временско ограничување </string>
   <string name="preferences__the_amount_of_time_to_wait_before_forgetting_passphrase">Време после кое лозинката ќе биде избришана од меморија</string>
   <string name="preferences__notifications">Известувања</string>
-  <string name="preferences__display_message_notifications_in_status_bar">Покажете известувања во лентата за статуси</string>
   <string name="preferences__led_color">LED боја</string>
   <string name="preferences__led_color_unknown">Непознато</string>
   <string name="preferences__pref_led_blink_title">LED примерок за трепкање</string>

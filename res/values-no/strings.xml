@@ -12,9 +12,9 @@
   <string name="ApplicationPreferencesActivity_delete_all_old_messages_now">Slette alle gamle meldinger nå?</string>
   <string name="ApplicationPreferencesActivity_are_you_sure_you_would_like_to_immediately_trim_all_conversation_threads_to_the_s_most_recent_messages">Er du sikker på at du ønsker å umiddelbart trimme alle samtaletrådene til de siste %s meldinger?</string>
   <string name="ApplicationPreferencesActivity_delete">Slett</string>
-  <string name="ApplicationPreferencesActivity_disable_storage_encryption">Deaktivere kryptert lagring?</string>
-  <string name="ApplicationPreferencesActivity_warning_this_will_disable_storage_encryption_for_all_messages">
-Advarsel! Dette vil deaktivere kryptert lagring av alle meldinger og nøkler. Dine krypterte sesjoner vil fortsette å fungere, men alle med fysisk tilgang til enheten din vil kunne få tilgang til dem.</string>
+  <string name="ApplicationPreferencesActivity_disable_passphrase">Deaktivere passord?</string>
+  <string name="ApplicationPreferencesActivity_disable_lock_screen">
+Deaktivere skjermlås for meldinger?</string>
   <string name="ApplicationPreferencesActivity_disable">Deaktiver</string>
   <string name="ApplicationPreferencesActivity_unregistering">Avregistrerer</string>
   <string name="ApplicationPreferencesActivity_unregistering_from_textsecure_messages">Avregistrerer fra TextSecure meldinger...</string>
@@ -41,7 +41,7 @@ Om du vil benytte TextSecure meldinger igjen i fremtiden må du registrere telef
   <!--AttchmentManager-->
   <string name="AttachmentManager_cant_open_media_selection">Finner ikke en applikasjon for å velge media.</string>
   <!--AttachmentTypeSelectorAdapter-->
-  <string name="AttachmentTypeSelectorAdapter_take_photo">Ta bilde</string>
+  <string name="AttachmentTypeSelectorAdapter_camera">Kamera</string>
   <string name="AttachmentTypeSelectorAdapter_picture">Bilde</string>
   <string name="AttachmentTypeSelectorAdapter_video">Video</string>
   <string name="AttachmentTypeSelectorAdapter_audio">Audio</string>
@@ -54,6 +54,7 @@ Om du vil benytte TextSecure meldinger igjen i fremtiden må du registrere telef
 denne kontakten.</string>
   <string name="ConfirmIdentityDialog_accept">Godta</string>
   <!--ContactsDatabase-->
+  <string name="ContactsDatabase_message_s">Melding %s</string>
   <!--ConversationItem-->
   <string name="ConversationItem_message_size_d_kb">Meldingsstørrelse: %d KB</string>
   <string name="ConversationItem_expires_s">Utløper: %s</string>
@@ -80,6 +81,7 @@ denne kontakten.</string>
   <string name="ConversationActivity_select_contact_info">Velg kontaktinformasjon</string>
   <string name="ConversationActivity_compose_message">Skriv melding</string>
   <string name="ConversationActivity_sorry_there_was_an_error_setting_your_attachment">Beklager, en feil oppstod ved behandling av vedlegg.</string>
+  <string name="ConversationActivity_the_gif_you_selected_was_too_big">GIF-bildet du valgte var for stort!</string>
   <string name="ConversationActivity_sorry_the_selected_video_exceeds_message_size_restrictions">Beklager, den valgte videofilen overstiger restriksjonene på meldingsstørrelse (%1$skB).</string>
   <string name="ConversationActivity_sorry_the_selected_audio_exceeds_message_size_restrictions">Beklager, den valgte lydfilen overstiger restriksjonene på meldingsstørrelse (%1$skB).</string>
   <string name="ConversationActivity_recipient_is_not_a_valid_sms_or_email_address_exclamation">Mottakeren er ikke en gyldig SMS- eller e-postadresse!</string>
@@ -143,16 +145,16 @@ denne kontakten.</string>
   <string name="DateUtils_now">Nå</string>
   <string name="DateUtils_minutes_ago">%d min</string>
   <!--DeviceListActivity-->
-  <string name="DeviceListActivity_disconnect_s">Frakoble «%s»?</string>
-  <string name="DeviceListActivity_by_disconnecting_this_device_it_will_no_longer_be_able_to_send_or_receive">Ved å frakoble denne enheten vil den ikke lenger være i stand til å sende eller motta meldinger.</string>
+  <string name="DeviceListActivity_unlink_s">Frakoble \'%s\'?</string>
+  <string name="DeviceListActivity_by_unlinking_this_device_it_will_no_longer_be_able_to_send_or_receive">Ved å frakoble denne enheten vil den ikke lenger være i stand til å sende eller motta meldinger.</string>
   <string name="DeviceListActivity_network_connection_failed">Nettverksforbindelse feilet...</string>
   <string name="DeviceListActivity_try_again">Prøv igjen</string>
-  <string name="DeviceListActivity_disconnecting_device">Frakobler enhet...</string>
-  <string name="DeviceListActivity_disconnecting_device_no_ellipse">Frakobler enhet</string>
+  <string name="DeviceListActivity_unlinking_device">Frakobler enhet...</string>
+  <string name="DeviceListActivity_unlinking_device_no_ellipsis">Frakobler enhet</string>
   <string name="DeviceListActivity_network_failed">Nettverk feilet!</string>
   <!--DeviceListItem-->
   <string name="DeviceListItem_unnamed_device">Ikke navngitt enhet</string>
-  <string name="DeviceListItem_created_s">Opprettet %s</string>
+  <string name="DeviceListItem_linked_s">%s tilkoblet</string>
   <string name="DeviceListItem_last_active_s">Sist aktiv %s</string>
   <!--ShareActivity-->
   <string name="ShareActivity_share_with">Del med</string>
@@ -241,13 +243,13 @@ Gjenoppretting av en kryptert backup vil overskrive eksisterende nøkler, innsti
 - Lese alle meldingene dine
 \n- Sende meldinger i ditt navn
  </string>
-  <string name="DeviceProvisioningActivity_content_progress_title">Legger til enhet</string>
-  <string name="DeviceProvisioningActivity_content_progress_content">Legger til ny enhet...</string>
-  <string name="DeviceProvisioningActivity_content_progress_success">Enhet lagt til!</string>
+  <string name="DeviceProvisioningActivity_content_progress_title">Kobler enhet</string>
+  <string name="DeviceProvisioningActivity_content_progress_content">Kobler til ny enhet...</string>
+  <string name="DeviceProvisioningActivity_content_progress_success">Enhet tilkoblet!</string>
   <string name="DeviceProvisioningActivity_content_progress_no_device">Ingen enhet funnet.</string>
   <string name="DeviceProvisioningActivity_content_progress_network_error">Nettverksfeil.</string>
   <string name="DeviceProvisioningActivity_content_progress_key_error">Ugyldig QR-kode.</string>
-  <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_registered_already">Beklager, du har for mange enheter registrert allerede, forsøk å fjerne noen...</string>
+  <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">Beklager, du har for mange enheter koblet til allerede, forsøk å fjerne noen...</string>
   <!--PassphrasePromptActivity-->
   <string name="PassphrasePromptActivity_enter_passphrase">Tast inn passord</string>
   <string name="PassphrasePromptActivity_watermark_content_description">TextSecure ikon</string>
@@ -382,8 +384,9 @@ Mottatt melding med ukjent ID nøkkel. Klikk for å prosessere og vise.</string>
   <string name="KeyCachingService_passphrase_cached">TextSecure er ulåst</string>
   <string name="KeyCachingService_lock">Lås med passord</string>
   <!--MessageNotifier-->
-  <string name="MessageNotifier_d_messages_in_d_conversations">%1$d meldinger i %2$d samtaler</string>
+  <string name="MessageNotifier_d_new_messages_in_d_conversations">%1$d nye meldinger i %2$d samtaler</string>
   <string name="MessageNotifier_most_recent_from_s">Nyeste fra: %1$s</string>
+  <string name="MessageNotifier_locked_message">Låst melding...</string>
   <string name="MessageNotifier_media_message_with_text">Media melding: %s</string>
   <string name="MessageNotifier_no_subject">(Mangler emne)</string>
   <string name="MessageNotifier_message_delivery_failed">Levering av meldingen mislyktes.</string>
@@ -396,18 +399,19 @@ Mottatt melding med ukjent ID nøkkel. Klikk for å prosessere og vise.</string>
   <!--QuickResponseService-->
   <string name="QuickResponseService_quick_response_unavailable_when_TextSecure_is_locked">Rask tilbakemelding ikke tilgjengelig når TextSecure er låst!</string>
   <string name="QuickResponseService_problem_sending_message">Kunne ikke sende melding!</string>
+  <!--SingleRecipientNotificationBuilder-->
+  <string name="SingleRecipientNotificationBuilder_new_textsecure_message">Ny TextSecure melding</string>
+  <string name="SingleRecipientNotificationBuilder_contents_hidden">Innhold skjult</string>
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">Gammelt passord:</string>
   <string name="change_passphrase_activity__new_passphrase">Nytt passord:</string>
   <string name="change_passphrase_activity__repeat_new_passphrase">Gjenta nytt passord:</string>
+  <!--contact_selection_activity-->
+  <string name="contact_selection_activity__enter_name_or_number">Tast inn et navn eller nummer</string>
   <!--contact_selection_group_activity-->
-  <!--contact_selection_list_activity-->
   <string name="contact_selection_group_activity__no_contacts">Ingen kontakter.</string>
   <string name="contact_selection_group_activity__finding_contacts">Laster kontakter...</string>
   <!--single_contact_selection_activity-->
-  <string name="SingleContactSelectionActivity_you_are_not_registered_with_the_push_service">Du er ikke registrert hos \"push\" tjenesten...</string>
-  <string name="SingleContactSelectionActivity_updating_directory">Oppdaterer katalog</string>
-  <string name="SingleContactSelectionActivity_updating_push_directory">Oppdaterer «push»-katalogen …</string>
   <string name="SingleContactSelectionActivity_contact_photo">Kontaktbilde</string>
   <!--ContactSelectionListFragment-->
   <string name="ContactSelectionlistFragment_select_for">Velg for</string>
@@ -449,7 +453,7 @@ Mottatt melding med ukjent ID nøkkel. Klikk for å prosessere og vise.</string>
   <string name="country_selection_fragment__loading_countries">Laster land...</string>
   <string name="country_selection_fragment__search">Søk</string>
   <!--device_list_fragment-->
-  <string name="device_list_fragment__no_devices_paired">Ingen sammenkoblede enheter...</string>
+  <string name="device_list_fragment__no_devices_linked">Ingen enheter tilkoblet...</string>
   <!--log_submit_activity-->
   <string name="log_submit_activity__log_fetch_failed">Kunne ikke hente loggene fra din enhet. Du kan fremdeles benytte ADB for å hente debug logger.</string>
   <string name="log_submit_activity__thanks">Takk for hjelpen!</string>
@@ -588,7 +592,7 @@ feilet.</string>
   <string name="AndroidManifest__media_overview">Alle bilder</string>
   <string name="AndroidManifest__media_overview_named">Alle bilder med %1$s</string>
   <string name="AndroidManifest__message_details">Meldingsdetaljer</string>
-  <string name="AndroidManifest_manage_paired_devices">Administrer sammenkoblede enheter</string>
+  <string name="AndroidManifest_manage_linked_devices">Administrer tilkoblede enheter</string>
   <!--arrays.xml-->
   <string name="arrays__import_export">Importere / eksportere</string>
   <string name="arrays__my_identity_key">Min ID-nøkkel</string>
@@ -601,6 +605,9 @@ feilet.</string>
   <string name="arrays__settings_default">Standardinstillinger</string>
   <string name="arrays__enabled">Aktivert</string>
   <string name="arrays__disabled">Deaktivert</string>
+  <string name="arrays__name_and_message">Navn og melding</string>
+  <string name="arrays__name_only">Kun navn</string>
+  <string name="arrays__neither">Ingen</string>
   <!--plurals.xml-->
   <plurals name="hours_ago">
     <item quantity="one">%d time</item>
@@ -625,6 +632,7 @@ feilet.</string>
   <string name="preferences__change_my_passphrase">Velg et nytt passord</string>
   <string name="preferences__enable_passphrase">Aktiver passord</string>
   <string name="preferences__passphrase_summary">Passord %s</string>
+  <string name="preferences__enable_lock_screen_for_messages">Aktiver skjermlås for meldinger</string>
   <string name="preferences__screen_security">Skjermsikkerhet</string>
   <string name="preferences__screen_security_summary">Skjermsikkerhet %s</string>
   <string name="preferences__disable_screen_security_to_allow_screen_shots">Blokker skjermbilde i listen over siste applikasjoner og inni applikasjonen</string>
@@ -634,7 +642,7 @@ feilet.</string>
   <string name="preferences__pref_timeout_interval_title">Timeoutintervall</string>
   <string name="preferences__the_amount_of_time_to_wait_before_forgetting_passphrase">Tiden det skal gå før passordet slettes fra minnet på enheten</string>
   <string name="preferences__notifications">Varsling</string>
-  <string name="preferences__display_message_notifications_in_status_bar">Vis varsel om meldinger i status feltet</string>
+  <string name="preferences__enable_message_notifications">Aktiver meldingsvarling</string>
   <string name="preferences__led_color">LED farge</string>
   <string name="preferences__led_color_unknown">Ukjent</string>
   <string name="preferences__pref_led_blink_title">LED blinkemønster</string>
@@ -703,6 +711,7 @@ Gratis og private meldinger til TextSecure- og Signal-brukere
   <string name="preferences__support_wifi_calling">\'WiFi anrop\' kompatibilititetsmodus</string>
   <string name="preferences__enable_if_your_device_supports_sms_mms_delivery_over_wifi">Aktiver dersom enheten din bruker WiFi for å sende SMS/MMS (brukes bare hvis \'WiFi anrop\' er aktivert på enheten din)</string>
   <string name="preferences_app_protection__blocked_contacts">Blokkerte kontakter</string>
+  <string name="preferences_notifications__display_in_notifications">Vis i varslingslisten</string>
   <!--****************************************-->
   <!--menus-->
   <!--****************************************-->

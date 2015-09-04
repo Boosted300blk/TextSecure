@@ -47,6 +47,7 @@ import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.database.MmsDatabase;
 import org.thoughtcrime.securesms.database.MmsSmsDatabase;
+import org.thoughtcrime.securesms.database.PartDatabase;
 import org.thoughtcrime.securesms.database.SmsDatabase;
 import org.thoughtcrime.securesms.database.documents.IdentityKeyMismatch;
 import org.thoughtcrime.securesms.database.model.MediaMmsMessageRecord;
@@ -72,7 +73,7 @@ import java.util.Set;
  *
  */
 
-public class ConversationItem extends LinearLayout {
+public class ConversationItem extends LinearLayout implements Recipient.RecipientModifiedListener {
   private final static String TAG = ConversationItem.class.getSimpleName();
 
   private MessageRecord messageRecord;
@@ -80,6 +81,7 @@ public class ConversationItem extends LinearLayout {
   private Locale        locale;
   private boolean       groupThread;
   private boolean       pushDestination;
+  private Recipient     recipient;
 
   private View            bodyBubble;
   private TextView        bodyText;
@@ -155,6 +157,7 @@ public class ConversationItem extends LinearLayout {
     if (mediaThumbnail != null) {
       mediaThumbnail.setThumbnailClickListener(new ThumbnailClickListener());
       mediaThumbnail.setOnLongClickListener(new MultiSelectLongClickListener());
+      mediaThumbnail.setDownloadClickListener(new ThumbnailDownloadClickListener());
     }
   }
 
@@ -172,15 +175,18 @@ public class ConversationItem extends LinearLayout {
     this.selectionClickListener = selectionClickListener;
     this.groupThread            = groupThread;
     this.pushDestination        = pushDestination;
+    this.recipient              = messageRecord.getIndividualRecipient();
+
+    this.recipient.addListener(this);
 
     setSelectionBackgroundDrawables(messageRecord);
     setBodyText(messageRecord);
 
     if (hasConversationBubble(messageRecord)) {
-      setBubbleState(messageRecord);
+      setBubbleState(messageRecord, recipient);
       setStatusIcons(messageRecord);
-      setContactPhoto(messageRecord);
-      setGroupMessageStatus(messageRecord);
+      setContactPhoto(recipient);
+      setGroupMessageStatus(messageRecord, recipient);
       setEvents(messageRecord);
       setMinimumWidth();
       setMediaAttributes(messageRecord);
@@ -200,6 +206,9 @@ public class ConversationItem extends LinearLayout {
   }
 
   public void unbind() {
+    if (recipient != null) {
+      recipient.removeListener(this);
+    }
   }
 
   public MessageRecord getMessageRecord() {
@@ -208,16 +217,15 @@ public class ConversationItem extends LinearLayout {
 
   /// MessageRecord Attribute Parsers
 
-  private void setBubbleState(MessageRecord messageRecord) {
+  private void setBubbleState(MessageRecord messageRecord, Recipient recipient) {
     if (messageRecord.isOutgoing()) {
       bodyBubble.getBackground().setColorFilter(defaultBubbleColor, PorterDuff.Mode.MULTIPLY);
+      mediaThumbnail.setBackgroundColorHint(defaultBubbleColor);
     } else {
-      bodyBubble.getBackground().setColorFilter(messageRecord.getIndividualRecipient()
-                                                             .getColor()
-                                                             .toConversationColor(context),
-                                                PorterDuff.Mode.MULTIPLY);
+      int color = recipient.getColor().toConversationColor(context);
+      bodyBubble.getBackground().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+      mediaThumbnail.setBackgroundColorHint(color);
     }
-
   }
 
   private void setSelectionBackgroundDrawables(MessageRecord messageRecord) {
@@ -269,7 +277,7 @@ public class ConversationItem extends LinearLayout {
       mediaThumbnail.setImageResource(masterSecret, messageRecord.getId(),
                                       messageRecord.getDateReceived(),
                                       ((MediaMmsMessageRecord)messageRecord).getSlideDeckFuture());
-      mediaThumbnail.setShowProgress(!messageRecord.isFailed() && (!messageRecord.isOutgoing() || messageRecord.isPending()));
+      mediaThumbnail.hideControls(messageRecord.isFailed() || (messageRecord.isOutgoing() && !messageRecord.isPending()));
       bodyText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
     } else {
       mediaThumbnail.setVisibility(View.GONE);
@@ -277,9 +285,9 @@ public class ConversationItem extends LinearLayout {
     }
   }
 
-  private void setContactPhoto(MessageRecord messageRecord) {
+  private void setContactPhoto(Recipient recipient) {
     if (! messageRecord.isOutgoing()) {
-      setContactPhotoForRecipient(messageRecord.getIndividualRecipient());
+      setContactPhotoForRecipient(recipient);
     }
   }
 
@@ -339,9 +347,9 @@ public class ConversationItem extends LinearLayout {
     }
   }
 
-  private void setGroupMessageStatus(MessageRecord messageRecord) {
+  private void setGroupMessageStatus(MessageRecord messageRecord, Recipient recipient) {
     if (groupThread && !messageRecord.isOutgoing()) {
-      this.groupStatusText.setText(messageRecord.getIndividualRecipient().toShortString());
+      this.groupStatusText.setText(recipient.toShortString());
       this.groupStatusText.setVisibility(View.VISIBLE);
     } else {
       this.groupStatusText.setVisibility(View.GONE);
@@ -394,6 +402,20 @@ public class ConversationItem extends LinearLayout {
     new ConfirmIdentityDialog(context, masterSecret, messageRecord, mismatches.get(0)).show();
   }
 
+  @Override
+  public void onModified(Recipient recipient) {
+    if (hasConversationBubble(messageRecord)) {
+      setBubbleState(messageRecord, recipient);
+      setContactPhoto(recipient);
+      setGroupMessageStatus(messageRecord, recipient);
+    }
+  }
+
+  private class ThumbnailDownloadClickListener implements ThumbnailView.ThumbnailClickListener {
+    @Override public void onClick(View v, Slide slide) {
+      DatabaseFactory.getPartDatabase(context).setTransferState(messageRecord.getId(), slide.getPart().getPartId(), PartDatabase.TRANSFER_PROGRESS_STARTED);
+    }
+  }
   private class ThumbnailClickListener implements ThumbnailView.ThumbnailClickListener {
     private void fireIntent(Slide slide) {
       Log.w(TAG, "Clicked: " + slide.getUri() + " , " + slide.getContentType());
@@ -417,7 +439,7 @@ public class ConversationItem extends LinearLayout {
         Intent intent = new Intent(context, MediaPreviewActivity.class);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setDataAndType(slide.getUri(), slide.getContentType());
-        if (!messageRecord.isOutgoing()) intent.putExtra(MediaPreviewActivity.RECIPIENT_EXTRA, messageRecord.getIndividualRecipient().getRecipientId());
+        if (!messageRecord.isOutgoing()) intent.putExtra(MediaPreviewActivity.RECIPIENT_EXTRA, recipient.getRecipientId());
         intent.putExtra(MediaPreviewActivity.DATE_EXTRA, messageRecord.getDateReceived());
 
         context.startActivity(intent);

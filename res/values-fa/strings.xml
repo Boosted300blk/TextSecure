@@ -12,8 +12,10 @@
   <string name="ApplicationPreferencesActivity_delete_all_old_messages_now">پیام‌های قدیمی حذف شوند؟</string>
   <string name="ApplicationPreferencesActivity_are_you_sure_you_would_like_to_immediately_trim_all_conversation_threads_to_the_s_most_recent_messages">مطمئنید که می‌خواهید از هر گفتگو %s پیام جدیدتر را نگه داشته و بقیه را حذف کنید؟</string>
   <string name="ApplicationPreferencesActivity_delete">حذف</string>
-  <string name="ApplicationPreferencesActivity_disable_storage_encryption">غیر فعال کردن رمزگذاری ذخیره سازی؟</string>
+  <string name="ApplicationPreferencesActivity_disable_passphrase">عبارت عبور غیر فعال کنم؟</string>
   <string name="ApplicationPreferencesActivity_disable">غیرفعال کردن</string>
+  <string name="ApplicationPreferencesActivity_unregistering">لغو ثبت نام</string>
+  <string name="ApplicationPreferencesActivity_unregistering_from_textsecure_messages">لغو ثبت برای پیامهای TextSecur ...</string>
   <string name="ApplicationPreferencesActivity_disable_textsecure_messages">غیر فعال کردن پیام های TextSecure ؟</string>
   <string name="ApplicationPreferencesActivity_error_connecting_to_server">خطا در اتصال به سرور!</string>
   <string name="ApplicationPreferencesActivity_sms_enabled">اس ام اس فعال</string>
@@ -34,7 +36,6 @@
   <!--AttchmentManager-->
   <string name="AttachmentManager_cant_open_media_selection">امکان یافتن برنامه‌ای برای انتخاب مدیا وجود ندارد.</string>
   <!--AttachmentTypeSelectorAdapter-->
-  <string name="AttachmentTypeSelectorAdapter_take_photo">عکس گرفتن</string>
   <string name="AttachmentTypeSelectorAdapter_picture">تصویر</string>
   <string name="AttachmentTypeSelectorAdapter_video">ویدئو</string>
   <string name="AttachmentTypeSelectorAdapter_audio">صدا</string>
@@ -46,6 +47,7 @@
 تماس با ما</string>
   <string name="ConfirmIdentityDialog_accept">پذیرفتن</string>
   <!--ContactsDatabase-->
+  <string name="ContactsDatabase_message_s">ارسال پیام به  %s</string>
   <!--ConversationItem-->
   <string name="ConversationItem_message_size_d_kb">حجم پیام: %d کیلوبایت</string>
   <string name="ConversationItem_expires_s">انقضا: %s</string>
@@ -56,6 +58,7 @@
   <string name="ConversationItem_group_action_left">%1$s گروه را ترک کرده است.</string>
   <string name="ConversationItem_click_for_details">برای جزئیات بیشتر ضربه بزنید</string>
   <string name="ConversationItem_click_to_approve_unencrypted_mms_dialog_title">مجدد به تکه تکه کردن MMS؟</string>
+  <string name="ConversationItem_unable_to_open_media">برنامه ای برای بازکردن این رسانه وجود ندارد.</string>
   <!--ConversationActivity-->
   <string name="ConversationActivity_initiate_secure_session_question">گفتگوی امن آغاز شود؟</string>
   <string name="ConversationActivity_initiate_secure_session_with_s_question">گفتگوی امن با %s آغاز شود؟</string>
@@ -93,6 +96,7 @@
   <string name="ConversationFragment_message_details">جزییات پیام</string>
   <string name="ConversationFragment_sender_s_transport_s_sent_s_received_s">فرستنده: %1$s\nنوع انتقال: %2$s\nزمان ارسال: %3$s\nزمان دریافت: %4$s</string>
   <string name="ConversationFragment_confirm_message_delete">تایید حذف پیام</string>
+  <string name="ConversationFragment_are_you_sure_you_want_to_permanently_delete_all_selected_messages">آیا از حذف دایم تمام پیام های انتخاب شده اطمینان دارید؟</string>
   <string name="ConversationFragment_save_to_sd_card">ذخیره در ذخیره سازی؟</string>
   <string name="ConversationFragment_success_exclamation">موفقیت!</string>
   <string name="ConversationFragment_unable_to_write_to_sd_card_exclamation">قادر نیست به ارسال به ذخیره سازی!</string>
@@ -121,8 +125,7 @@
   <string name="DateUtils_now">اکنون</string>
   <!--DeviceListActivity-->
   <string name="DeviceListActivity_try_again">دوباره تلاش کن</string>
-  <string name="DeviceListActivity_disconnecting_device">قطع اتصال دستگاه ...</string>
-  <string name="DeviceListActivity_disconnecting_device_no_ellipse">قطع اتصال دستگاه</string>
+  <string name="DeviceListActivity_network_failed">شکست خوردن در شبکه!</string>
   <!--DeviceListItem-->
   <string name="DeviceListItem_unnamed_device">دستگاهی که نامش ذکر نشده</string>
   <!--ShareActivity-->
@@ -192,8 +195,6 @@
   <string name="DeviceProvisioningActivity_continue">ادامه</string>
   <string name="DeviceProvisioningActivity_title">پیوند این دستگاه؟</string>
   <string name="DeviceProvisioningActivity_content_intro">این قادر خواهد بود به</string>
-  <string name="DeviceProvisioningActivity_content_progress_content">اضافه کردن دستگاه جدید ...</string>
-  <string name="DeviceProvisioningActivity_content_progress_success">دستگاه اضافه شده است!</string>
   <string name="DeviceProvisioningActivity_content_progress_no_device">دستگاه یافت نشد.</string>
   <string name="DeviceProvisioningActivity_content_progress_network_error">خطای شبکه.</string>
   <string name="DeviceProvisioningActivity_content_progress_key_error">کد QR نامعتبر است.</string>
@@ -209,7 +210,9 @@
   <string name="RatingManager_no_thanks">نه ممنون</string>
   <string name="RatingManager_later">بعد</string>
   <!--RecipientPreferencesActivity-->
+  <string name="RecipientPreferenceActivity_block_this_contact_question">انسداد این تماس؟</string>
   <string name="RecipientPreferenceActivity_block">بلوک</string>
+  <string name="RecipientPreferenceActivity_unblock_this_contact_question">رفع انسداد این تماس؟</string>
   <string name="RecipientPreferenceActivity_unblock">رفع انسداد</string>
   <string name="RecipientPreferenceActivity_enabled">فعال</string>
   <string name="RecipientPreferenceActivity_disabled">غیر فعال</string>
@@ -325,17 +328,18 @@
   <string name="MessageNotifier_media_message">پیام رسانه</string>
   <string name="MessageNotifier_reply">پاسخ</string>
   <!--QuickResponseService-->
+  <string name="QuickResponseService_problem_sending_message">بروز خطا در ارسال پیام!</string>
+  <!--SingleRecipientNotificationBuilder-->
   <!--change_passphrase_activity-->
   <string name="change_passphrase_activity__old_passphrase">رمز قبلی:</string>
   <string name="change_passphrase_activity__new_passphrase">رمز جدید:</string>
   <string name="change_passphrase_activity__repeat_new_passphrase">تکرار رمز جدید:</string>
+  <!--contact_selection_activity-->
+  <string name="contact_selection_activity__enter_name_or_number">نام یا شماره را وارد کنید</string>
   <!--contact_selection_group_activity-->
-  <!--contact_selection_list_activity-->
   <string name="contact_selection_group_activity__no_contacts">مخاطبی یافت نشد.</string>
   <string name="contact_selection_group_activity__finding_contacts">بارگیری لیست مخاطب‌ها</string>
   <!--single_contact_selection_activity-->
-  <string name="SingleContactSelectionActivity_updating_directory">به روز رسانی دایرکتوری</string>
-  <string name="SingleContactSelectionActivity_updating_push_directory">به روز رسانی دایرکتوری فشار ...</string>
   <string name="SingleContactSelectionActivity_contact_photo">تصویر مخاطب</string>
   <!--ContactSelectionListFragment-->
   <string name="ContactSelectionlistFragment_select_for">انتخاب برای</string>
@@ -514,7 +518,6 @@
   <string name="preferences__pref_timeout_interval_title">فاصله ایست</string>
   <string name="preferences__the_amount_of_time_to_wait_before_forgetting_passphrase">برنامه پس از چه مدت به طور خودکار رمز وارد شده را فراموش کند و قفل شود</string>
   <string name="preferences__notifications">اطلاعیه‌ها</string>
-  <string name="preferences__display_message_notifications_in_status_bar">نمایش اطلاعیه دریافت پیام در نوار وضعیت</string>
   <string name="preferences__led_color">رنگ چراغ ال‌ای‌دی</string>
   <string name="preferences__led_color_unknown">ناشناخته</string>
   <string name="preferences__pref_led_blink_title">الگوی چشمک زدن</string>
@@ -628,7 +631,9 @@
   <string name="conversation__menu_leave_group">مرخص شدن از گروه</string>
   <string name="conversation__menu_delete_thread">حذف موضوع</string>
   <string name="conversation__menu_view_media">همه تصاویر</string>
+  <string name="conversation__menu_conversation_settings">تنظیمات گفتگو</string>
   <!--conversation_popup-->
+  <string name="conversation_popup__menu_expand_popup">ببند پنجره پاپ آپ</string>
   <!--conversation_callable-->
   <string name="conversation_add_to_contacts__menu_add_to_contacts">افزودن به مخاطب‌ها</string>
   <!--conversation_group_options-->
