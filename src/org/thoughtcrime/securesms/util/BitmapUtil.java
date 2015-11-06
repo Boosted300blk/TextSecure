@@ -16,6 +16,11 @@ import android.util.Pair;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.DecodeFormat;
+import com.bumptech.glide.load.engine.Resource;
+import com.bumptech.glide.load.resource.bitmap.BitmapResource;
+import com.bumptech.glide.load.resource.bitmap.Downsampler;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 
 import org.thoughtcrime.securesms.mms.MediaConstraints;
 
@@ -69,8 +74,8 @@ public class BitmapUtil {
       throws ExecutionException
   {
     final Pair<Integer, Integer> dimensions = getDimensions(getInputStreamForModel(context, model));
-    final Pair<Integer, Integer> clamped = clampDimensions(dimensions.first, dimensions.second,
-                                                           maxWidth, maxHeight);
+    final Pair<Integer, Integer> clamped    = clampDimensions(dimensions.first, dimensions.second,
+                                                              maxWidth, maxHeight);
     return createScaledBitmapInto(context, model, clamped.first, clamped.second);
   }
 
@@ -89,16 +94,18 @@ public class BitmapUtil {
   private static <T> Bitmap createScaledBitmapInto(Context context, T model, int width, int height)
       throws ExecutionException
   {
-    try {
-      return Glide.with(context)
-                  .load(model)
-                  .asBitmap()
-                  .skipMemoryCache(true)
-                  .into(width, height)
-                  .get();
-    } catch (InterruptedException ie) {
-      throw new AssertionError(ie);
+    final Bitmap rough = Downsampler.AT_LEAST.decode(getInputStreamForModel(context, model),
+                                                     Glide.get(context).getBitmapPool(),
+                                                     width, height,
+                                                     DecodeFormat.PREFER_RGB_565);
+
+    final Resource<Bitmap> resource = BitmapResource.obtain(rough, Glide.get(context).getBitmapPool());
+    final Resource<Bitmap> result   = new FitCenter(context).transform(resource, width, height);
+
+    if (result == null) {
+      throw new ExecutionException(new BitmapDecodingException("unable to transform Bitmap"));
     }
+    return result.get();
   }
 
   public static <T> Bitmap createScaledBitmap(Context context, T model, float scale)
@@ -159,14 +166,24 @@ public class BitmapUtil {
     return bytes;
   }
 
+  /*
+   * NV21 a.k.a. YUV420sp
+   * YUV 4:2:0 planar image, with 8 bit Y samples, followed by interleaved V/U plane with 8bit 2x2
+   * subsampled chroma samples.
+   *
+   * http://www.fourcc.org/yuv.php#NV21
+   */
   public static byte[] rotateNV21(@NonNull final byte[] yuv,
                                   final int width,
                                   final int height,
                                   final int rotation)
+      throws IOException
   {
     if (rotation == 0) return yuv;
     if (rotation % 90 != 0 || rotation < 0 || rotation > 270) {
       throw new IllegalArgumentException("0 <= rotation < 360, rotation % 90 == 0");
+    } else if ((width * height * 3) / 2 != yuv.length) {
+      throw new IOException("provided width and height don't jive with the data length");
     }
 
     final byte[]  output    = new byte[yuv.length];

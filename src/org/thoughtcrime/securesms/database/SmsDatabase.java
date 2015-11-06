@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.support.annotation.NonNull;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
@@ -343,8 +344,49 @@ public class SmsDatabase extends MessagingDatabase {
     return new Pair<>(newMessageId, record.getThreadId());
   }
 
+  public @NonNull Pair<Long, Long> insertReceivedCall(@NonNull String number) {
+    return insertCallLog(number, Types.INCOMING_CALL_TYPE, false);
+  }
+
+  public @NonNull Pair<Long, Long> insertOutgoingCall(@NonNull String number) {
+    return insertCallLog(number, Types.OUTGOING_CALL_TYPE, false);
+  }
+
+  public @NonNull Pair<Long, Long> insertMissedCall(@NonNull String number) {
+    return insertCallLog(number, Types.MISSED_CALL_TYPE, true);
+  }
+
+  private @NonNull Pair<Long, Long> insertCallLog(@NonNull String number, long type, boolean unread) {
+    Recipients recipients = RecipientFactory.getRecipientsFromString(context, number, true);
+    long       threadId   = DatabaseFactory.getThreadDatabase(context).getThreadIdFor(recipients);
+
+    ContentValues values = new ContentValues(6);
+    values.put(ADDRESS, number);
+    values.put(ADDRESS_DEVICE_ID,  1);
+    values.put(DATE_RECEIVED, System.currentTimeMillis());
+    values.put(DATE_SENT, System.currentTimeMillis());
+    values.put(READ, unread ? 0 : 1);
+    values.put(TYPE, type);
+    values.put(THREAD_ID, threadId);
+
+    SQLiteDatabase db = databaseHelper.getWritableDatabase();
+    long messageId    = db.insert(TABLE_NAME, null, values);
+
+    DatabaseFactory.getThreadDatabase(context).update(threadId);
+    notifyConversationListeners(threadId);
+    jobManager.add(new TrimThreadJob(context, threadId));
+
+    if (unread) {
+      DatabaseFactory.getThreadDatabase(context).setUnread(threadId);
+    }
+
+    return new Pair<>(messageId, threadId);
+  }
+
   protected Pair<Long, Long> insertMessageInbox(IncomingTextMessage message, long type) {
-    if (message.isPreKeyBundle()) {
+    if (message.isJoined()) {
+      type = (type & (Types.TOTAL_MASK - Types.BASE_TYPE_MASK)) | Types.JOINED_TYPE;
+    } else if (message.isPreKeyBundle()) {
       type |= Types.KEY_EXCHANGE_BIT | Types.KEY_EXCHANGE_BUNDLE_BIT;
     } else if (message.isSecureMessage()) {
       type |= Types.SECURE_MESSAGE_BIT;
@@ -431,7 +473,7 @@ public class SmsDatabase extends MessagingDatabase {
     contentValues.put(ADDRESS, PhoneNumberUtils.formatNumber(message.getRecipients().getPrimaryRecipient().getNumber()));
     contentValues.put(THREAD_ID, threadId);
     contentValues.put(BODY, message.getMessageBody());
-    contentValues.put(DATE_RECEIVED, date);
+    contentValues.put(DATE_RECEIVED, System.currentTimeMillis());
     contentValues.put(DATE_SENT, date);
     contentValues.put(READ, 1);
     contentValues.put(TYPE, type);

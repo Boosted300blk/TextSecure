@@ -1,7 +1,6 @@
 package org.thoughtcrime.securesms;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 
 import org.thoughtcrime.securesms.util.MmsCharacterCalculator;
 import org.thoughtcrime.securesms.util.PushCharacterCalculator;
@@ -68,8 +67,13 @@ public class TransportOptions {
 
   public void disableTransport(Type type) {
     Optional<TransportOption> option = find(type);
+
     if (option.isPresent()) {
       enabledTransports.remove(option.get());
+
+      if (manuallySelected && type == selectedType) {
+        manuallySelected = false;
+      }
     }
   }
 
@@ -100,7 +104,7 @@ public class TransportOptions {
 
     results.add(new TransportOption(Type.TEXTSECURE, R.drawable.ic_send_push_white_24dp,
                                     context.getResources().getColor(R.color.textsecure_primary),
-                                    context.getString(R.string.ConversationActivity_transport_textsecure),
+                                    context.getString(R.string.ConversationActivity_transport_signal),
                                     context.getString(R.string.conversation_activity__type_message_push),
                                     new PushCharacterCalculator()));
 

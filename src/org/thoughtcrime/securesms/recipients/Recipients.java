@@ -185,9 +185,7 @@ public class Recipients implements Iterable<Recipient>, RecipientModifiedListene
       }
     }
 
-    synchronized (this) {
-      listeners.add(listener);
-    }
+    listeners.add(listener);
   }
 
   public synchronized void removeListener(RecipientsModifiedListener listener) {
@@ -259,7 +257,7 @@ public class Recipients implements Iterable<Recipient>, RecipientModifiedListene
     return Util.join(recipientArray, " ");
   }
 
-  public String[] toNumberStringArray(boolean scrub) {
+  public @NonNull String[] toNumberStringArray(boolean scrub) {
     String[] recipientsArray     = new String[recipients.size()];
     Iterator<Recipient> iterator = recipients.iterator();
     int i                        = 0;
@@ -278,6 +276,13 @@ public class Recipients implements Iterable<Recipient>, RecipientModifiedListene
     }
 
     return recipientsArray;
+  }
+
+  public @NonNull List<String> toNumberStringList(boolean scrub) {
+    List<String> results = new LinkedList<>();
+    Collections.addAll(results, toNumberStringArray(scrub));
+
+    return results;
   }
 
   public String toShortString() {

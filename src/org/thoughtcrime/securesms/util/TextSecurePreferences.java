@@ -44,6 +44,7 @@ public class TextSecurePreferences {
   public  static final String ENABLE_MANUAL_MMS_PREF           = "pref_enable_manual_mms";
 
   private static final String LAST_VERSION_CODE_PREF           = "last_version_code";
+  private static final String LAST_EXPERIENCE_VERSION_PREF     = "last_experience_version_code";
   public  static final String RINGTONE_PREF                    = "pref_key_ringtone";
   private static final String VIBRATE_PREF                     = "pref_key_vibrate";
   private static final String NOTIFICATION_PREF                = "pref_key_enable_notifications";
@@ -67,6 +68,7 @@ public class TextSecurePreferences {
   private static final String GCM_PASSWORD_PREF                = "pref_gcm_password";
   private static final String PROMPTED_PUSH_REGISTRATION_PREF  = "pref_prompted_push_registration";
   private static final String PROMPTED_DEFAULT_SMS_PREF        = "pref_prompted_default_sms";
+  private static final String PROMPTED_SHARE_PREF              = "pref_prompted_share";
   private static final String SIGNALING_KEY_PREF               = "pref_signaling_key";
   private static final String DIRECTORY_FRESH_TIME_PREF        = "pref_directory_refresh_time";
   private static final String IN_THREAD_NOTIFICATION_PREF      = "pref_key_inthread_notifications";
@@ -87,6 +89,17 @@ public class TextSecurePreferences {
   public  static final String MEDIA_DOWNLOAD_MOBILE_PREF       = "pref_media_download_mobile";
   public  static final String MEDIA_DOWNLOAD_WIFI_PREF         = "pref_media_download_wifi";
   public  static final String MEDIA_DOWNLOAD_ROAMING_PREF      = "pref_media_download_roaming";
+
+  public  static final String SYSTEM_EMOJI_PREF                = "pref_system_emoji";
+  private static final String MULTI_DEVICE_PROVISIONED_PREF    = "pref_multi_device";
+
+  public static void setMultiDevice(Context context, boolean value) {
+    setBooleanPreference(context, MULTI_DEVICE_PROVISIONED_PREF, value);
+  }
+
+  public static boolean isMultiDevice(Context context) {
+    return getBooleanPreference(context, MULTI_DEVICE_PROVISIONED_PREF, false);
+  }
 
   public static NotificationPrivacyPreference getNotificationPrivacy(Context context) {
     return new NotificationPrivacyPreference(getStringPreference(context, NOTIFICATION_PRIVACY_PREF, "all"));
@@ -340,7 +353,15 @@ public class TextSecurePreferences {
     if (!setIntegerPrefrenceBlocking(context, LAST_VERSION_CODE_PREF, versionCode)) {
       throw new IOException("couldn't write version code to sharedpreferences");
     }
- }
+  }
+
+  public static int getLastExperienceVersionCode(Context context) {
+    return getIntegerPreference(context, LAST_EXPERIENCE_VERSION_PREF, 0);
+  }
+
+  public static void setLastExperienceVersionCode(Context context, int versionCode) {
+    setIntegerPrefrence(context, LAST_EXPERIENCE_VERSION_PREF, versionCode);
+  }
 
   public static String getTheme(Context context) {
     return getStringPreference(context, THEME_PREF, "light");
@@ -403,6 +424,14 @@ public class TextSecurePreferences {
     setBooleanPreference(context, PROMPTED_DEFAULT_SMS_PREF, value);
   }
 
+  public static boolean hasPromptedShare(Context context) {
+    return getBooleanPreference(context, PROMPTED_SHARE_PREF, false);
+  }
+
+  public static void setPromptedShare(Context context, boolean value) {
+    setBooleanPreference(context, PROMPTED_SHARE_PREF, value);
+  }
+
   public static boolean isInterceptAllMmsEnabled(Context context) {
     return getBooleanPreference(context, ALL_MMS_PREF, true);
   }
@@ -447,6 +476,10 @@ public class TextSecurePreferences {
     return Integer.parseInt(getStringPreference(context, THREAD_TRIM_LENGTH, "500"));
   }
 
+  public static boolean isSystemEmojiPreferred(Context context) {
+    return getBooleanPreference(context, SYSTEM_EMOJI_PREF, false);
+  }
+
   public static @NonNull Set<String> getMobileMediaDownloadAllowed(Context context) {
     return getMediaDownloadAllowed(context, MEDIA_DOWNLOAD_MOBILE_PREF, R.array.pref_media_download_mobile_data_default);
   }
@@ -464,7 +497,6 @@ public class TextSecurePreferences {
                                   key,
                                   new HashSet<>(Arrays.asList(context.getResources().getStringArray(defaultValuesRes))));
   }
-
 
   public static void setBooleanPreference(Context context, String key, boolean value) {
     PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(key, value).apply();

@@ -43,8 +43,8 @@ public class Recipient {
 
   private final long recipientId;
 
-  private String  number;
-  private String  name;
+  private @NonNull  String  number;
+  private @Nullable String  name;
   private boolean stale;
 
   private ContactPhoto contactPhoto;
@@ -123,7 +123,7 @@ public class Recipient {
     notifyListeners();
   }
 
-  public String getNumber() {
+  public @NonNull String getNumber() {
     return number;
   }
 
@@ -179,7 +179,7 @@ public class Recipient {
     }
 
     for (RecipientModifiedListener listener : localListeners)
-      listener.onModified(Recipient.this);
+      listener.onModified(this);
   }
 
   public interface RecipientModifiedListener {

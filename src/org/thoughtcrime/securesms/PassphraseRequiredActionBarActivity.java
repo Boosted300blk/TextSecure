@@ -31,12 +31,14 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
   private static final int STATE_PROMPT_PASSPHRASE        = 2;
   private static final int STATE_UPGRADE_DATABASE         = 3;
   private static final int STATE_PROMPT_PUSH_REGISTRATION = 4;
+  private static final int STATE_EXPERIENCE_UPGRADE       = 5;
 
   private BroadcastReceiver clearKeyReceiver;
   private boolean           isVisible;
 
   @Override
   protected final void onCreate(Bundle savedInstanceState) {
+    Log.w(TAG, "onCreate(" + savedInstanceState + ")");
     onPreCreate();
     final MasterSecret masterSecret = KeyCachingService.getMasterSecret(this);
     routeApplicationState(masterSecret);
@@ -52,8 +54,8 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
 
   @Override
   protected void onResume() {
+    Log.w(TAG, "onResume()");
     super.onResume();
-    initializeScreenshotSecurity();
     KeyCachingService.registerPassphraseActivityStarted(this);
     MessageRetrievalService.registerActivityStarted(this);
     isVisible = true;
@@ -61,6 +63,7 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
 
   @Override
   protected void onPause() {
+    Log.w(TAG, "onPause()");
     super.onPause();
     KeyCachingService.registerPassphraseActivityStopped(this);
     MessageRetrievalService.registerActivityStopped(this);
@@ -69,6 +72,7 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
 
   @Override
   protected void onDestroy() {
+    Log.w(TAG, "onDestroy()");
     super.onDestroy();
     removeClearKeyReceiver(this);
   }
@@ -128,17 +132,20 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
     Log.w(TAG, "routeApplicationState(), state: " + state);
 
     switch (state) {
-      case STATE_CREATE_PASSPHRASE:        return getCreatePassphraseIntent();
-      case STATE_PROMPT_PASSPHRASE:        return getPromptPassphraseIntent();
-      case STATE_UPGRADE_DATABASE:         return getUpgradeDatabaseIntent(masterSecret);
-      case STATE_PROMPT_PUSH_REGISTRATION: return getPushRegistrationIntent(masterSecret);
-      default:                             return null;
+    case STATE_CREATE_PASSPHRASE:        return getCreatePassphraseIntent();
+    case STATE_PROMPT_PASSPHRASE:        return getPromptPassphraseIntent();
+    case STATE_UPGRADE_DATABASE:         return getUpgradeDatabaseIntent(masterSecret);
+    case STATE_PROMPT_PUSH_REGISTRATION: return getPushRegistrationIntent(masterSecret);
+    case STATE_EXPERIENCE_UPGRADE:       return getExperienceUpgradeIntent();
+    default:                             return null;
     }
   }
 
   private int getApplicationState(MasterSecret masterSecret) {
     if (!MasterSecretUtil.isPassphraseInitialized(this)) {
       return STATE_CREATE_PASSPHRASE;
+    } else if (ExperienceUpgradeActivity.isUpdate(this)) {
+      return STATE_EXPERIENCE_UPGRADE;
     } else if (masterSecret == null) {
       return STATE_PROMPT_PASSPHRASE;
     } else if (DatabaseUpgradeActivity.isUpdate(this)) {
@@ -166,6 +173,10 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
                            masterSecret);
   }
 
+  private Intent getExperienceUpgradeIntent() {
+    return getRoutedIntent(ExperienceUpgradeActivity.class, getIntent(), null);
+  }
+
   private Intent getPushRegistrationIntent(MasterSecret masterSecret) {
     return getRoutedIntent(RegistrationActivity.class, getConversationListIntent(), masterSecret);
   }
@@ -179,16 +190,6 @@ public abstract class PassphraseRequiredActionBarActivity extends BaseActionBarA
 
   private Intent getConversationListIntent() {
     return new Intent(this, ConversationListActivity.class);
-  }
-
-  private void initializeScreenshotSecurity() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH &&
-        TextSecurePreferences.isScreenSecurityEnabled(this))
-    {
-      getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-    } else {
-      getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-    }
   }
 
   private void initializeClearKeyReceiver() {

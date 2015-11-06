@@ -21,37 +21,40 @@ import android.content.res.Resources.Theme;
 import android.net.Uri;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.thoughtcrime.securesms.crypto.MasterSecret;
+import org.thoughtcrime.securesms.attachments.Attachment;
+import org.thoughtcrime.securesms.attachments.UriAttachment;
+import org.thoughtcrime.securesms.database.AttachmentDatabase;
+import org.thoughtcrime.securesms.util.MediaUtil;
 import org.thoughtcrime.securesms.util.Util;
+import org.whispersystems.libaxolotl.util.guava.Optional;
 
 import java.io.IOException;
-import java.io.InputStream;
-
-import ws.com.google.android.mms.pdu.PduPart;
 
 public abstract class Slide {
 
-  protected final PduPart      part;
-  protected final Context      context;
-  protected       MasterSecret masterSecret;
+  protected final Attachment attachment;
+  protected final Context    context;
 
-  public Slide(Context context, @NonNull PduPart part) {
-    this.part    = part;
-    this.context = context;
-  }
+  public Slide(@NonNull Context context, @NonNull Attachment attachment) {
+    this.context    = context;
+    this.attachment = attachment;
 
-  public Slide(Context context, @NonNull MasterSecret masterSecret, @NonNull PduPart part) {
-    this(context, part);
-    this.masterSecret = masterSecret;
   }
 
   public String getContentType() {
-    return new String(part.getContentType());
+    return attachment.getContentType();
   }
 
+  @Nullable
   public Uri getUri() {
-    return part.getDataUri();
+    return attachment.getDataUri();
+  }
+
+  @Nullable
+  public Uri getThumbnailUri() {
+    return attachment.getThumbnailUri();
   }
 
   public boolean hasImage() {
@@ -66,42 +69,41 @@ public abstract class Slide {
     return false;
   }
 
-  public PduPart getPart() {
-    return part;
-  }
+  public @NonNull String getContentDescription() { return ""; }
 
-  public Uri getThumbnailUri() {
-    return null;
+  public Attachment asAttachment() {
+    return attachment;
   }
 
   public boolean isInProgress() {
-    return part.isInProgress();
+    return attachment.isInProgress();
   }
 
-  public long getTransferProgress() {
-    return part.getTransferProgress();
+  public boolean isPendingDownload() {
+    return getTransferState() == AttachmentDatabase.TRANSFER_PROGRESS_FAILED ||
+           getTransferState() == AttachmentDatabase.TRANSFER_PROGRESS_AUTO_PENDING;
+  }
+
+  public long getTransferState() {
+    return attachment.getTransferState();
   }
 
   public @DrawableRes int getPlaceholderRes(Theme theme) {
     throw new AssertionError("getPlaceholderRes() called for non-drawable slide");
   }
 
-  public boolean isDraft() {
-    return !getPart().getPartId().isValid();
+  public boolean hasPlaceholder() {
+    return false;
   }
 
-  protected static void assertMediaSize(Context context, Uri uri, long max)
-      throws MediaTooLargeException, IOException
+  protected static Attachment constructAttachmentFromUri(@NonNull Context context,
+                                                         @NonNull Uri     uri,
+                                                         @NonNull String  defaultMime,
+                                                                  long     size)
+    throws IOException
   {
-    InputStream in = context.getContentResolver().openInputStream(uri);
-    long   size    = 0;
-    byte[] buffer  = new byte[512];
-    int read;
-
-    while ((read = in.read(buffer)) != -1) {
-      size += read;
-      if (size > max) throw new MediaTooLargeException("Media exceeds maximum message size.");
-    }
+    Optional<String> resolvedType = Optional.fromNullable(MediaUtil.getMimeType(context, uri));
+    return new UriAttachment(uri, resolvedType.or(defaultMime), AttachmentDatabase.TRANSFER_PROGRESS_STARTED, size);
   }
 
   @Override
@@ -114,8 +116,7 @@ public abstract class Slide {
            this.hasAudio() == that.hasAudio()                        &&
            this.hasImage() == that.hasImage()                        &&
            this.hasVideo() == that.hasVideo()                        &&
-           this.isDraft() == that.isDraft()                          &&
-           this.getTransferProgress() == that.getTransferProgress()  &&
+           this.getTransferState() == that.getTransferState()        &&
            Util.equals(this.getUri(), that.getUri())                 &&
            Util.equals(this.getThumbnailUri(), that.getThumbnailUri());
   }
@@ -123,9 +124,6 @@ public abstract class Slide {
   @Override
   public int hashCode() {
     return Util.hashCode(getContentType(), hasAudio(), hasImage(),
-                         hasVideo(), isDraft(), getUri(), getThumbnailUri(), getTransferProgress());
+                         hasVideo(), getUri(), getThumbnailUri(), getTransferState());
   }
-
-
-
 }

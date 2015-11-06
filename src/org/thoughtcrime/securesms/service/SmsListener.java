@@ -27,7 +27,6 @@ import android.util.Log;
 
 import org.thoughtcrime.securesms.ApplicationContext;
 import org.thoughtcrime.securesms.jobs.SmsReceiveJob;
-import org.thoughtcrime.securesms.protocol.WirePrefix;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.thoughtcrime.securesms.util.Util;
 
@@ -39,7 +38,7 @@ public class SmsListener extends BroadcastReceiver {
   private static final String SMS_RECEIVED_ACTION  = Telephony.Sms.Intents.SMS_RECEIVED_ACTION;
   private static final String SMS_DELIVERED_ACTION = Telephony.Sms.Intents.SMS_DELIVER_ACTION;
 
-  private static final Pattern CHALLENGE_PATTERN = Pattern.compile(".*Your TextSecure verification code: ([0-9]{3,4})-([0-9]{3,4}).*");
+  private static final Pattern CHALLENGE_PATTERN = Pattern.compile(".*Your TextSecure verification code: ([0-9]{3,4})-([0-9]{3,4}).*", Pattern.DOTALL);
 
   private boolean isExemption(SmsMessage message, String messageBody) {
 
@@ -121,7 +120,7 @@ public class SmsListener extends BroadcastReceiver {
       return true;
     }
 
-    return WirePrefix.isEncryptedMessage(messageBody) || WirePrefix.isKeyExchange(messageBody);
+    return false;
   }
 
   private boolean isChallenge(Context context, Intent intent) {

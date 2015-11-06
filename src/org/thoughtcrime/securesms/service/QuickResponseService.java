@@ -38,7 +38,7 @@ public class QuickResponseService extends MasterSecretIntentService {
 
     if (masterSecret == null) {
       Log.w(TAG, "Got quick response request when locked...");
-      Toast.makeText(this, R.string.QuickResponseService_quick_response_unavailable_when_TextSecure_is_locked, Toast.LENGTH_LONG).show();
+      Toast.makeText(this, R.string.QuickResponseService_quick_response_unavailable_when_Signal_is_locked, Toast.LENGTH_LONG).show();
       return;
     }
 
@@ -55,7 +55,7 @@ public class QuickResponseService extends MasterSecretIntentService {
         if (recipients.isSingleRecipient()) {
           MessageSender.send(this, masterSecret, new OutgoingTextMessage(recipients, content), -1, false);
         } else {
-          MessageSender.send(this, masterSecret, new OutgoingMediaMessage(this, recipients, new SlideDeck(), content,
+          MessageSender.send(this, masterSecret, new OutgoingMediaMessage(recipients, new SlideDeck(), content, System.currentTimeMillis(),
                                                                           ThreadDatabase.DistributionTypes.DEFAULT), -1, false);
         }
       }
